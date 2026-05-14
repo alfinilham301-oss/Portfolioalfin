@@ -1,695 +1,877 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Alfin Ilham — Supply Chain & Logistics Professional</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Alfin Ilham · Cosmic Logistics</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- GSAP & Three.js -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <!-- Google Fonts & Font Awesome -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        /* ========== DARK COSMIC NIGHT ========== */
+        body.dark {
+            --bg-primary: #0b1838;
+            --text-primary: #F8FAFE;
+            --text-secondary: #c8ddf5;
+            --accent: #88a5c0;
+            --accent-strong: #3a60a0;
+            --card-bg: rgba(20, 35, 65, 0.6);
+            --border: rgba(136, 165, 192, 0.35);
+            --photo-overlay: linear-gradient(135deg, rgba(136,165,192,0.25), rgba(0,0,0,0.4));
+            --skill-bg: rgba(136,165,192,0.15);
+            --heading-gradient: linear-gradient(135deg, #FFFFFF, #88a5c0);
+        }
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
+        /* ========== LIGHT COSMIC DAWN ========== */
+        body.light {
+            --bg-primary: #FEF7F0;
+            --text-primary: #3D2A1F;
+            --text-secondary: #7A5A4A;
+            --accent: #E8A87C;
+            --accent-strong: #C38D6B;
+            --card-bg: rgba(255, 252, 245, 0.8);
+            --border: #F2E0CE;
+            --photo-overlay: linear-gradient(135deg, rgba(232,168,124,0.12), rgba(200,140,100,0.05));
+            --skill-bg: rgba(232,168,124,0.12);
+            --heading-gradient: linear-gradient(135deg, #C38D6B, #E8A87C);
+        }
 
-    body {
-      background: #0b1120;
-      color: #f1f5f9;
-      overflow-x: hidden;
-      position: relative;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.2s;
+            overflow-x: hidden;
+        }
 
-    /* Background gambar dengan overlay interaktif */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('assets/img/BG.PNG') no-repeat center center/cover;
-      opacity: 0.12;
-      z-index: -2;
-      pointer-events: none;
-    }
+        /* Canvas 3D Background */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
 
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 20% 30%, rgba(15, 23, 42, 0.85), #0a0f1c);
-      z-index: -1;
-      pointer-events: none;
-    }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        body.dark ::-webkit-scrollbar-track { background: #1A2545; }
+        body.light ::-webkit-scrollbar-track { background: #EDE0D4; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
-    a {
-      text-decoration: none;
-      color: white;
-      transition: 0.2s;
-    }
+        /* LOADER */
+        #loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .loader-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: var(--accent);
+        }
 
-    /* ================= NAVBAR ================= */
-    header {
-      width: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 999;
-      background: rgba(10, 18, 28, 0.92);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(56, 189, 248, 0.2);
-    }
+        /* NAVBAR */
+        .navbar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1250px;
+            padding: 12px 28px;
+            border-radius: 100px;
+            background: var(--card-bg);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: var(--heading-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .nav-links { display: flex; gap: 32px; }
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .open-to-work {
+            background: rgba(136,165,192,0.2);
+            border: 1px solid var(--accent);
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .nav-actions { display: flex; gap: 12px; align-items: center; }
+        .icon-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .lang-select {
+            display: flex;
+            gap: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 60px;
+            padding: 4px 12px;
+        }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+        }
+        .lang-btn.active { background: var(--accent); color: #0a0a1a; }
+        .download-btn {
+            background: var(--accent);
+            color: #0A0C1A;
+            padding: 8px 18px;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    nav {
-      max-width: 1300px;
-      margin: auto;
-      padding: 18px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
+        .container { width: 90%; max-width: 1300px; margin: 0 auto; padding: 20px 0; }
 
-    .logo {
-      font-size: 28px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #38bdf8, #818cf8);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+        /* HERO */
+        .hero {
+            min-height: 90vh;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            align-items: center;
+            gap: 60px;
+            padding: 120px 0 60px;
+        }
+        .hero-left h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1.05;
+            background: var(--heading-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .hero-left p {
+            margin: 30px 0;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+        .btn-group {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary { background: var(--accent); color: #0a0a1a; }
+        .btn-outline { border: 2px solid var(--accent); background: transparent; color: var(--accent); }
+        .btn:hover { transform: translateY(-4px); filter: brightness(1.05); }
 
-    .menu {
-      display: flex;
-      gap: 32px;
-      flex-wrap: wrap;
-    }
+        .hero-photo { position: relative; }
+        .photo-frame {
+            background: rgba(0,0,0,0.2);
+            border-radius: 38px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(4px);
+            position: relative;
+            overflow: hidden;
+        }
+        .photo-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--photo-overlay);
+            pointer-events: none;
+            border-radius: 30px;
+        }
+        .photo-frame img {
+            width: 100%;
+            border-radius: 30px;
+            display: block;
+        }
+        .floating-tag {
+            position: absolute;
+            bottom: 20px;
+            left: -15px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            padding: 12px 20px;
+            border-radius: 24px;
+            border-left: 4px solid var(--accent);
+            font-family: monospace;
+            font-weight: 600;
+        }
 
-    .menu a {
-      font-size: 15px;
-      font-weight: 500;
-      color: #cbd5e6;
-      transition: 0.25s;
-      letter-spacing: 0.3px;
-    }
+        /* Section header */
+        .section-header {
+            margin-bottom: 60px;
+            border-left: 6px solid var(--accent);
+            padding-left: 28px;
+        }
+        .section-header span {
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+        .section-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-top: 12px;
+            letter-spacing: -0.5px;
+            background: var(--heading-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
 
-    .menu a:hover {
-      color: #38bdf8;
-      transform: translateY(-2px);
-    }
+        /* Timeline (sama seperti sebelumnya) */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 8px;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+            opacity: 0.4;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 70px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 35px;
+            align-items: start;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -35px;
+            top: 24px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+        }
+        .timeline-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 28px;
+            border: 1px solid var(--border);
+        }
+        .timeline-card h3 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            margin: 10px 0 4px;
+            background: var(--heading-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .timeline-card ul { margin-top: 18px; padding-left: 22px; }
+        .timeline-card li { margin-bottom: 10px; color: var(--text-secondary); }
+        .timeline-img {
+            background: rgba(0,0,0,0.2);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            aspect-ratio: 16 / 10;
+            position: relative;
+        }
+        .timeline-img::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--photo-overlay);
+            pointer-events: none;
+        }
+        .timeline-img img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* ================= PAGES ================= */
-    .page {
-      display: none;
-      min-height: 100vh;
-      padding: 130px 7% 90px;
-    }
+        /* Skills 3 kategori */
+        .skills-categories { display: flex; flex-direction: column; gap: 40px; }
+        .skill-category h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--accent);
+        }
+        .skills-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+        .skill-pill {
+            background: var(--skill-bg);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .skill-pill i { color: var(--accent); }
+        .skill-pill:hover { background: var(--accent); color: #0a0a1a; transform: translateY(-3px); }
 
-    .page.active {
-      display: block;
-      animation: fadeUp 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    }
+        /* Project */
+        .project-card {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 45px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 32px;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+        .project-img {
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+        }
+        .project-img::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--photo-overlay);
+        }
+        .project-img img { width: 100%; border-radius: 28px; }
+        .tech-badge {
+            display: inline-block;
+            background: rgba(136,165,192,0.25);
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            margin-right: 10px;
+            margin-top: 16px;
+            color: var(--accent);
+        }
 
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(28px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+        /* Contact */
+        .contact-terminal {
+            text-align: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 60px 40px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s;
+        }
+        .contact-terminal:hover { transform: scale(1.01); }
+        .contact-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 35px 0; }
+        .contact-link {
+            background: rgba(255,255,255,0.08);
+            padding: 12px 26px;
+            border-radius: 60px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            border: 1px solid var(--border);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .contact-link:hover { background: var(--accent); color: #0a0a1a; }
+        footer { text-align: center; padding: 40px 0; border-top: 1px solid var(--border); margin-top: 20px; }
 
-    /* ================= SECTION TITLE ================= */
-    .section-title {
-      margin-bottom: 45px;
-    }
-
-    .section-title h2 {
-      font-size: 42px;
-      font-weight: 700;
-      background: linear-gradient(to right, #e2e8f0, #94a3f8);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 12px;
-    }
-
-    .section-title p {
-      color: #94a3b8;
-      border-left: 3px solid #38bdf8;
-      padding-left: 15px;
-      font-weight: 400;
-    }
-
-    /* ================= BUTTONS & CARDS ================= */
-    .btn-group {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 14px 32px;
-      border-radius: 40px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: #38bdf8;
-      color: #0f172a;
-      box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 14px 30px rgba(56, 189, 248, 0.45);
-      background: #0ea5e9;
-    }
-
-    .btn-outline {
-      border: 1.5px solid #38bdf8;
-      background: transparent;
-      color: #e0f2fe;
-    }
-
-    .btn-outline:hover {
-      background: #38bdf8;
-      color: #0a0f1c;
-      border-color: #38bdf8;
-    }
-
-    .card {
-      background: rgba(17, 28, 52, 0.7);
-      backdrop-filter: blur(2px);
-      padding: 30px;
-      border-radius: 32px;
-      border: 1px solid rgba(56, 189, 248, 0.15);
-      transition: all 0.3s;
-    }
-
-    .card:hover {
-      border-color: #38bdf8;
-      transform: translateY(-6px);
-      background: #0f1a33;
-    }
-
-    /* ================= HOME ================= */
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 50px;
-      align-items: center;
-    }
-
-    .hero-text h1 {
-      font-size: 62px;
-      font-weight: 800;
-      line-height: 1.2;
-    }
-
-    .hero-text h1 span {
-      color: #38bdf8;
-    }
-
-    .hero-text p {
-      color: #cbd5e6;
-      margin: 25px 0 30px;
-      line-height: 1.7;
-      font-size: 16px;
-    }
-
-    .photo-box {
-      width: 100%;
-      max-width: 340px;
-      margin: 0 auto;
-      border-radius: 40px;
-      background: linear-gradient(145deg, #1e2a4a, #0f172a);
-      padding: 7px;
-      box-shadow: 0 30px 40px -15px rgba(0,0,0,0.5);
-      transform: rotate(1.5deg);
-      transition: 0.4s;
-    }
-
-    .photo-box img {
-      width: 100%;
-      height: auto;
-      border-radius: 34px;
-      display: block;
-      object-fit: cover;
-    }
-
-    .floating-card {
-      background: #111c34e6;
-      backdrop-filter: blur(8px);
-      padding: 15px 25px;
-      border-radius: 28px;
-      margin-top: 20px;
-      text-align: center;
-      border: 1px solid #38bdf8;
-    }
-
-    /* ================= TIMELINE ================= */
-    .timeline {
-      position: relative;
-      margin: 30px 0 50px;
-    }
-
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 18px;
-      top: 0;
-      width: 3px;
-      height: 100%;
-      background: linear-gradient(to bottom, #38bdf8, #818cf8);
-    }
-
-    .timeline-item {
-      position: relative;
-      padding-left: 70px;
-      margin-bottom: 40px;
-    }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: 8px;
-      top: 20px;
-      width: 22px;
-      height: 22px;
-      background: #0ea5e9;
-      border-radius: 50%;
-      box-shadow: 0 0 0 4px rgba(56,189,248,0.3);
-    }
-
-    .timeline-content {
-      background: #0f172fcc;
-      backdrop-filter: blur(4px);
-      padding: 28px;
-      border-radius: 28px;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .company-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-
-    .company-logo img {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      object-fit: cover;
-      background: white;
-      padding: 5px;
-    }
-
-    /* ================= SKILL GRID ================= */
-    .skill-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 20px;
-    }
-
-    .skill-badge {
-      background: #0f172f;
-      padding: 18px 20px;
-      border-radius: 60px;
-      text-align: center;
-      font-weight: 500;
-      border: 1px solid #2d3a5e;
-      transition: 0.2s;
-    }
-
-    .skill-badge i {
-      color: #38bdf8;
-      margin-right: 10px;
-    }
-
-    .skill-badge:hover {
-      background: #1e2a55;
-      border-color: #38bdf8;
-    }
-
-    /* ================= PROJECT PREVIEW ================= */
-    .project-showcase {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      align-items: center;
-      margin-top: 30px;
-    }
-
-    .project-img {
-      flex: 1;
-      border-radius: 32px;
-      overflow: hidden;
-      box-shadow: 0 20px 35px -12px black;
-    }
-
-    .project-img img {
-      width: 100%;
-      display: block;
-    }
-
-    .project-desc {
-      flex: 1;
-    }
-
-    /* ================= CONTACT ================= */
-    .contact-box {
-      background: linear-gradient(135deg, #0c1a2f, #0a1125);
-      padding: 55px;
-      border-radius: 48px;
-      text-align: center;
-      border: 1px solid #38bdf880;
-    }
-
-    .contact-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(56, 189, 248, 0.12);
-      padding: 12px 24px;
-      border-radius: 60px;
-      margin: 8px 6px;
-      transition: 0.2s;
-      border: 1px solid transparent;
-    }
-
-    .contact-link i {
-      font-size: 22px;
-      color: #38bdf8;
-    }
-
-    .contact-link:hover {
-      background: #38bdf8;
-      color: #0a0f1c;
-      border-color: white;
-      transform: translateY(-3px);
-    }
-
-    .contact-link:hover i {
-      color: #0a0f1c;
-    }
-
-    footer {
-      text-align: center;
-      padding: 25px;
-      border-top: 1px solid #1e2a44;
-      font-size: 13px;
-      color: #7e8aa2;
-    }
-
-    @media (max-width: 980px) {
-      .hero {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-      .hero-text h1 {
-        font-size: 44px;
-      }
-      nav {
-        flex-direction: column;
-        gap: 15px;
-      }
-      .timeline-item {
-        padding-left: 50px;
-      }
-      .section-title h2 {
-        font-size: 32px;
-      }
-      .contact-box {
-        padding: 35px;
-      }
-    }
-  </style>
+        .reveal { opacity: 0; transform: translateY(50px); }
+        @media (max-width: 980px) {
+            .hero { grid-template-columns: 1fr; text-align: center; gap: 40px; }
+            .hero-left h1 { font-size: 3.2rem; }
+            .nav-links { display: none; }
+            .timeline-item { grid-template-columns: 1fr; gap: 20px; }
+            .project-card { grid-template-columns: 1fr; }
+            .section-header h2 { font-size: 2rem; }
+            .floating-tag { left: 5px; bottom: -8px; width: 90%; }
+        }
+    </style>
 </head>
-<body>
+<body class="dark">
+<canvas id="canvas-bg"></canvas>
 
-<header>
-  <nav>
-    <div class="logo">ALFIN ILHAM</div>
-    <div class="menu">
-      <a href="#" onclick="showPage('home')"><i class="fas fa-home"></i> Home</a>
-      <a href="#" onclick="showPage('about')"><i class="fas fa-user"></i> About</a>
-      <a href="#" onclick="showPage('experience')"><i class="fas fa-briefcase"></i> Experience</a>
-      <a href="#" onclick="showPage('projects')"><i class="fas fa-code"></i> Projects</a>
-      <a href="#" onclick="showPage('skills')"><i class="fas fa-cogs"></i> Skills</a>
-      <a href="#" onclick="showPage('contact')"><i class="fas fa-envelope"></i> Contact</a>
-    </div>
-  </nav>
-</header>
+<!-- Loader -->
+<div id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-text" id="loaderText">✦ WELCOME TO ALFIN'S PORTFOLIO ✦</div>
+</div>
 
-<!-- ================= HOME SECTION ================= -->
-<section class="page active" id="home">
-  <div class="hero">
-    <div class="hero-text">
-      <h1>ALFIN ILHAM <br> <span>Supply Chain & Logistics Professional</span></h1>
-      <p><i class="fas fa-map-marker-alt"></i> Indonesia &nbsp;|&nbsp; <i class="fas fa-phone-alt"></i> +62 859-6313-1098</p>
-      <p>Menggabungkan keahlian logistik, optimasi distribusi, dan pengembangan digital cargo. 5+ tahun dalam manajemen 3PL, vendor, serta peningkatan efisiensi operasional berbasis data.</p>
-      <div class="btn-group">
-        <a href="#" onclick="showPage('experience')" class="btn btn-primary"><i class="fas fa-chart-line"></i> Lihat Pengalaman</a>
-        <a href="#" onclick="showPage('contact')" class="btn btn-outline"><i class="fas fa-paper-plane"></i> Hubungi Saya</a>
-      </div>
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="logo">✦ ALFIN ILHAM</div>
+    <div class="nav-links">
+        <a href="#home" data-i18n="nav.home">Home</a>
+        <a href="#experience" data-i18n="nav.exp">Experience</a>
+        <a href="#skills" data-i18n="nav.skills">Skills</a>
+        <a href="#projects" data-i18n="nav.projects">Projects</a>
+        <a href="#contact" data-i18n="nav.contact">Contact</a>
     </div>
-    <div class="hero-image">
-      <div class="photo-box">
-        <img src="assets/img/PROFIL.PNG" alt="Alfin Ilham">
-      </div>
-      <div class="floating-card">
-        <i class="fas fa-truck-fast" style="color:#38bdf8; font-size: 24px;"></i>
-        <h3>5+ Years</h3>
-        <p>Logistics & Supply Chain</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= ABOUT ================= -->
-<section class="page" id="about">
-  <div class="section-title">
-    <h2>Tentang Saya</h2>
-    <p>Professional Summary & Pendidikan</p>
-  </div>
-  <div style="display: grid; gap: 35px;">
-    <div class="card">
-      <h3><i class="fas fa-quote-left"></i> Professional Summary</h3>
-      <p style="margin-top: 15px; line-height: 1.8;">Profesional di bidang Supply Chain, Logistics Planning, dan Third-Party Logistics (3PL) dengan pengalaman lebih dari 5 tahun dalam distribusi, transport planning, vendor management, dan operasional logistik. Berpengalaman memimpin tim planner, mengelola 30+ vendor 3PL, forecasting distribusi, optimasi rute serta efisiensi biaya transportasi hingga 10%. Memiliki kemampuan tambahan dalam pengembangan layanan cargo digital: business process, frontend website, integrasi API, dan digital marketing.</p>
-    </div>
-    <div class="card">
-      <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
-        <img src="assets/img/pnd.png" alt="Pendidikan" style="width: 65px; border-radius: 20px;">
-        <div>
-          <h3><i class="fas fa-graduation-cap"></i> Pendidikan</h3>
-          <p><strong>Universitas Pelita Bangsa – Cikarang</strong><br>S1 Manajemen (MSDM) | 2021 – 2026 (Sedang Berjalan)<br>IPK: 3.37 / 4.00</p>
+    <div class="nav-actions">
+        <div class="open-to-work"><i class="fas fa-badge-check"></i> #OpenToWork</div>
+        <div class="lang-select">
+            <button class="lang-btn" id="langID">🇮🇩 ID</button>
+            <button class="lang-btn" id="langEN">🇬🇧 EN</button>
         </div>
-      </div>
+        <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+        <a href="#" id="downloadCV" class="download-btn"><i class="fas fa-download"></i> <span data-i18n="resume">Resume</span></a>
     </div>
-    <div class="card">
-      <h3><i class="fas fa-language"></i> Bahasa</h3>
-      <p>🇮🇩 Bahasa Indonesia — Mahir<br>🇬🇧 Bahasa Inggris — Menengah (aktif membaca dokumen teknis & komunikasi dasar)</p>
-    </div>
-  </div>
-</section>
+</nav>
 
-<!-- ================= EXPERIENCE + ACHIEVEMENTS ================= -->
-<section class="page" id="experience">
-  <div class="section-title">
-    <h2>Riwayat Pekerjaan</h2>
-    <p>Perjalanan profesional & pencapaian kunci</p>
-  </div>
-  <div class="timeline">
-    <!-- PT Lidah Buaya Group -->
-    <div class="timeline-item">
-      <div class="timeline-content">
-        <div class="company-logo">
-          <img src="assets/img/BG.PNG" alt="Lidah Buaya" style="background:#fff; object-fit: cover;">
-          <h3>PT Lidah Buaya Group</h3>
+<main class="container">
+    <!-- Hero -->
+    <section id="home" class="hero reveal">
+        <div class="hero-left">
+            <h1>ALFIN ILHAM</h1>
+            <p data-i18n="hero.desc">Profesional logistik dengan 6+ tahun pengalaman, dari asisten driver (kenek) hingga Supervisor Order Management dan Founder Linus Cargo. Menginisiasi sistem centralized vendor management berbasis spreadsheet yang memangkas personel dari ±14 menjadi 4–5 orang, serta membangun platform digital cargo dari nol.</p>
+            <div class="btn-group">
+                <a href="#experience" class="btn btn-primary" data-i18n="btn.journey">Lihat Perjalanan</a>
+                <a href="#contact" class="btn btn-outline" data-i18n="btn.contact">Hubungi Saya</a>
+            </div>
         </div>
-        <h4 style="color:#38bdf8;">Supervisor Order Management • Juni 2025 – Sekarang</h4>
-        <ul style="padding-left: 20px; margin-top: 12px;">
-          <li>Memimpin tim planner distribusi ±4.500 ton per bulan dengan tingkat ketepatan 98%.</li>
-          <li>Mengembangkan forecasting permintaan bersama Sales & PPIC, mengurangi stockout hingga 50%.</li>
-          <li>Optimasi rute distribusi berdasarkan area dan kapasitas operasional.</li>
-          <li>Koordinasi warehouse, manufaktur, dan sales untuk kelancaran distribusi.</li>
-          <li>Menyusun laporan operasional untuk decision making manajemen.</li>
-        </ul>
-      </div>
-    </div>
-    <!-- PT Kawan Lama Group tambahkan logo KLG.PNG -->
-    <div class="timeline-item">
-      <div class="timeline-content">
-        <div class="company-logo">
-          <img src="assets/img/KLG.PNG" alt="Kawan Lama Group">
-          <h3>PT Kawan Lama Group</h3>
+        <div class="hero-photo">
+            <div class="photo-frame">
+                <img src="assets/img/profil.png" alt="Alfin Ilham">
+            </div>
+            <div class="floating-tag"><i class="fas fa-charging-station"></i> Kenek → Supervisor → Founder</div>
         </div>
-        <h4 style="color:#38bdf8;">Transport Planning Staff (3PL) • Agustus 2019 – Juni 2025</h4>
-        <ul>
-          <li>Sentralisasi armada 4 gudang via Google Spreadsheet: kapasitas 40 → 120+ unit/hari.</li>
-          <li>Mengelola 30+ vendor 3PL, monitoring KPI (ketepatan kedatangan, performa) stabil 98%.</li>
-          <li>Analisis data pengiriman, optimasi rute dan negosiasi hemat biaya transport hingga 10%.</li>
-          <li>Kolaborasi lintas departemen meningkatkan efektivitas distribusi.</li>
-          <li>Menjamin SLA vendor dan monitoring real-time armada.</li>
-        </ul>
-      </div>
-    </div>
-    <!-- Linus Cargo (Digital Cargo Development) -->
-    <div class="timeline-item">
-      <div class="timeline-content">
-        <h3>Linus Cargo</h3>
-        <h4 style="color:#38bdf8;">Digital Cargo Development (Project Contribution) • 2025 – sekarang</h4>
-        <ul>
-          <li>Penyusunan business process operasional layanan cargo modern.</li>
-          <li>Frontend website operasional & integrasi API bersama tim IT.</li>
-          <li>Desain promosi digital & materi marketing dasar.</li>
-          <li>Membangun fondasi layanan cargo digital.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- KEY ACHIEVEMENTS BOX -->
-  <div class="section-title" style="margin-top: 20px;">
-    <h2><i class="fas fa-trophy"></i> Key Achievements</h2>
-    <p>Dampak & hasil nyata</p>
-  </div>
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 25px;">
-    <div class="card"><i class="fas fa-charging-station" style="font-size: 32px; color:#38bdf8;"></i><h3 style="margin: 15px 0 8px;">+200% Kapasitas Armada</h3><p>Sistem sentralisasi armada meningkatkan efisiensi tanpa tambahan tenaga kerja.</p></div>
-    <div class="card"><i class="fas fa-chart-line" style="font-size: 32px; color:#38bdf8;"></i><h3 style="margin: 15px 0 8px;">98% Akurasi Pengiriman</h3><p>Mempertahankan tingkat ketepatan distribusi & performa vendor di angka 98%.</p></div>
-    <div class="card"><i class="fas fa-dollar-sign" style="font-size: 32px; color:#38bdf8;"></i><h3 style="margin: 15px 0 8px;">Efisiensi Biaya 10%</h3><p>Optimasi rute & negosiasi vendor menekan biaya transportasi signifikan.</p></div>
-    <div class="card"><i class="fas fa-boxes" style="font-size: 32px; color:#38bdf8;"></i><h3 style="margin: 15px 0 8px;">4.500 Ton/Bulan</h3><p>Memimpin distribusi skala besar dengan ketepatan 98% dan pengurangan stockout 50%.</p></div>
-  </div>
-</section>
+    <!-- Experience Timeline -->
+    <section id="experience" class="reveal">
+        <div class="section-header">
+            <span>← JOURNEY</span>
+            <h2 data-i18n="exp.title">Dari Lapangan ke Digital Logistics</h2>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-card">
+                    <span style="color:var(--accent);font-weight:800;">AGUSTUS 2019 – JUNI 2025</span>
+                    <h3>PT Kawan Lama Group</h3>
+                    <p data-i18n="exp.kl.role">Asisten Driver → Transport Planning & 3PL Operations Staff</p>
+                    <ul>
+                        <li data-i18n="exp.kl.p1">Mulai sebagai asisten driver (kenek), memahami operasional distribusi.</li>
+                        <li data-i18n="exp.kl.p2">Maret 2020: dipercaya mengelola schedule driver & fleet management.</li>
+                        <li data-i18n="exp.kl.p3">4 bulan kemudian pindah ke Vendor Management (3PL Operations).</li>
+                        <li data-i18n="exp.kl.p4">Membantu pemenuhan armada eksternal sesuai permintaan warehouse.</li>
+                        <li data-i18n="exp.kl.p5"><strong>Inisiasi sistem centralized vendor management berbasis spreadsheet otomatis</strong> – efisiensi order & monitoring.</li>
+                        <li data-i18n="exp.kl.p6">Hasil: personel order, monitoring, invoice GR berkurang dari ±14 menjadi 4–5 orang.</li>
+                        <li data-i18n="exp.kl.p7">Optimalisasi route planning & monitoring berbasis sistem.</li>
+                    </ul>
+                </div>
+                <div class="timeline-img"><img src="assets/img/KLG.PNG" alt="Kawan Lama"></div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-card">
+                    <span style="color:var(--accent);font-weight:800;">JUNI 2025 – SEKARANG</span>
+                    <h3>PT Lidah Buaya Group (Linus Logistics)</h3>
+                    <p data-i18n="exp.lidah.role">Supervisor Order Management</p>
+                    <ul>
+                        <li data-i18n="exp.lidah.p1">Mengelola distribusi hingga 4.500 ton per bulan, akurasi 98%.</li>
+                        <li data-i18n="exp.lidah.p2">Mengubah mindset staff: KPI, SLA, dan pentingnya WMS.</li>
+                        <li data-i18n="exp.lidah.p3">Mewajibkan komunikasi lintas departemen dalam grup (Sales, PPIC, BOA, Owner).</li>
+                        <li data-i18n="exp.lidah.p4">Mengawasi PPIC dalam MPS (Make to Stock) dan sinkronisasi Make to Order dengan shipdate.</li>
+                        <li data-i18n="exp.lidah.p5">Menginisiasi planning by maps untuk optimasi pengiriman.</li>
+                    </ul>
+                </div>
+                <div class="timeline-img"><img src="assets/img/BG.PNG" alt="Lidah Buaya"></div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-card">
+                    <span style="color:var(--accent);font-weight:800;">APRIL 2025 – SEKARANG</span>
+                    <h3>Linus Cargo</h3>
+                    <p data-i18n="exp.cargo.role">Founder & Digital Logistics Architect</p>
+                    <ul>
+                        <li data-i18n="exp.cargo.p1">Menginisiasi unit bisnis digital cargo atas instruksi owner (proyek mandek 1 tahun).</li>
+                        <li data-i18n="exp.cargo.p2">Merancang framework & business process, analisa SWOT kompetitor untuk pricing.</li>
+                        <li data-i18n="exp.cargo.p3">Mengembangkan website order & tracking (Laravel + VSCode), integrasi Swagger API.</li>
+                        <li data-i18n="exp.cargo.p4">Membuat SOP digital workflow, iklan promosi, kelola sosial media.</li>
+                        <li data-i18n="exp.cargo.p5">Mendorong transformasi logistik modern, transparan, dan efisien.</li>
+                    </ul>
+                </div>
+                <div class="timeline-img"><img src="assets/img/LC.PNG" alt="Linus Cargo"></div>
+            </div>
+        </div>
+    </section>
 
-<!-- ================= PROJECTS (LINUS CARGO WEBSITE) ================= -->
-<section class="page" id="projects">
-  <div class="section-title">
-    <h2>Project Highlight</h2>
-    <p>Linus Cargo – Website Operasional & Digital Cargo</p>
-  </div>
-  <div class="project-showcase">
-    <div class="project-img">
-      <img src="assets/img/project.png" alt="Linus Cargo Website Login Mockup">
-    </div>
-    <div class="project-desc card">
-      <h3><i class="fas fa-globe"></i> Linus Cargo Digital Platform</h3>
-      <p style="margin: 15px 0;">Pengembangan website operasional layanan cargo yang sedang berjalan. Mencakup frontend modern, integrasi API untuk sinkronisasi data, serta business process digital. Proyek ini mendukung transformasi digital logistic dengan fitur pemesanan dan monitoring pengiriman.</p>
-      <ul style="margin-left: 20px;">
-        <li>Frontend Development (HTML/CSS/JS, responsive)</li>
-        <li>Integrasi API dasar untuk data real-time</li>
-        <li>Business process development & digital marketing support</li>
-        <li>UI/UX sederhana untuk operational cargo</li>
-      </ul>
-      <div class="btn-group" style="margin-top: 20px;">
-        <span class="btn-outline" style="padding: 8px 20px;"><i class="fas fa-code-branch"></i> In Progress</span>
-      </div>
-    </div>
-  </div>
-  <div style="margin-top: 45px; background: #0b1426; border-radius: 36px; padding: 25px;" class="card">
-    <h3><i class="fas fa-microchip"></i> Technology & Tools</h3>
-    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px;">
-      <span class="skill-badge"><i class="fab fa-html5"></i> HTML5</span>
-      <span class="skill-badge"><i class="fab fa-css3-alt"></i> CSS3</span>
-      <span class="skill-badge"><i class="fab fa-js"></i> JavaScript</span>
-      <span class="skill-badge"><i class="fas fa-plug"></i> REST API</span>
-      <span class="skill-badge"><i class="fas fa-chart-simple"></i> Digital Marketing</span>
-    </div>
-  </div>
-</section>
+    <!-- Skills (Soft, Hard, Software) -->
+    <section id="skills" class="reveal">
+        <div class="section-header">
+            <span>← CORE COMPETENCIES</span>
+            <h2 data-i18n="skills.title">Soft · Hard · Digital Tools</h2>
+        </div>
+        <div class="skills-categories">
+            <div class="skill-category">
+                <h3><i class="fas fa-heart"></i> <span data-i18n="skills.soft">Soft Skills</span></h3>
+                <div class="skills-grid">
+                    <div class="skill-pill"><i class="fas fa-users"></i> Leadership & Coordination</div>
+                    <div class="skill-pill"><i class="fas fa-comments"></i> Cross-functional Communication</div>
+                    <div class="skill-pill"><i class="fas fa-brain"></i> Strategic Problem Solving</div>
+                    <div class="skill-pill"><i class="fas fa-chart-line"></i> Data‑Driven Decision Making</div>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3><i class="fas fa-cogs"></i> <span data-i18n="skills.hard">Hard Skills</span></h3>
+                <div class="skills-grid">
+                    <div class="skill-pill"><i class="fas fa-warehouse"></i> Supply Chain Management</div>
+                    <div class="skill-pill"><i class="fas fa-truck-fast"></i> Distribution & Transport Planning</div>
+                    <div class="skill-pill"><i class="fas fa-handshake"></i> Vendor 3PL Management</div>
+                    <div class="skill-pill"><i class="fas fa-chart-simple"></i> KPI / SLA Monitoring</div>
+                    <div class="skill-pill"><i class="fas fa-arrows-spin"></i> Workflow & Process Improvement</div>
+                    <div class="skill-pill"><i class="fas fa-microchip"></i> Digital Logistics Systems</div>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3><i class="fas fa-laptop-code"></i> <span data-i18n="skills.software">Software & Tools</span></h3>
+                <div class="skills-grid">
+                    <div class="skill-pill"><i class="fab fa-laravel"></i> Laravel / PHP</div>
+                    <div class="skill-pill"><i class="fas fa-code-branch"></i> REST API / Swagger</div>
+                    <div class="skill-pill"><i class="fab fa-html5"></i> HTML5 / CSS3 / JS</div>
+                    <div class="skill-pill"><i class="fas fa-file-excel"></i> Advanced Spreadsheet</div>
+                    <div class="skill-pill"><i class="fas fa-chalkboard-user"></i> WMS / TMS Basic</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<!-- ================= SKILLS ================= -->
-<section class="page" id="skills">
-  <div class="section-title">
-    <h2>Keahlian & Kompetensi</h2>
-    <p>Supply Chain, Teknis & Manajerial</p>
-  </div>
-  <div class="skill-grid">
-    <div class="skill-badge"><i class="fas fa-people-arrows"></i> Supply Chain Management</div>
-    <div class="skill-badge"><i class="fas fa-chart-pie"></i> Distribution Planning</div>
-    <div class="skill-badge"><i class="fas fa-route"></i> Route Optimization</div>
-    <div class="skill-badge"><i class="fas fa-truck"></i> Vendor Management (3PL)</div>
-    <div class="skill-badge"><i class="fas fa-chart-line"></i> Forecasting & Demand Planning</div>
-    <div class="skill-badge"><i class="fas fa-chart-simple"></i> Data Analysis & Excel</div>
-    <div class="skill-badge"><i class="fab fa-google"></i> Google Spreadsheet Expert</div>
-    <div class="skill-badge"><i class="fas fa-code"></i> Frontend Development</div>
-    <div class="skill-badge"><i class="fas fa-exchange-alt"></i> API Integration (Basic)</div>
-    <div class="skill-badge"><i class="fas fa-bullhorn"></i> Digital Marketing</div>
-    <div class="skill-badge"><i class="fas fa-chart-line"></i> KPI / SLA Monitoring</div>
-    <div class="skill-badge"><i class="fas fa-user-check"></i> Team Leadership</div>
-  </div>
-  <div class="card" style="margin-top: 40px;">
-    <h3><i class="fas fa-tags"></i> ATS Keywords</h3>
-    <p style="font-size: 14px; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px;">
-      <span class="skill-badge" style="background:#16213e;">Supply Chain Management</span>
-      <span class="skill-badge" style="background:#16213e;">Logistics Planning</span>
-      <span class="skill-badge" style="background:#16213e;">3PL Operations</span>
-      <span class="skill-badge" style="background:#16213e;">Vendor Management</span>
-      <span class="skill-badge" style="background:#16213e;">Route Optimization</span>
-      <span class="skill-badge" style="background:#16213e;">Transportation Management</span>
-      <span class="skill-badge" style="background:#16213e;">Fleet Management</span>
-      <span class="skill-badge" style="background:#16213e;">Logistics Supervisor</span>
-      <span class="skill-badge" style="background:#16213e;">Data Analysis</span>
-    </p>
-  </div>
-</section>
+    <!-- Project -->
+    <section id="projects" class="reveal">
+        <div class="section-header">
+            <span>← FLAGSHIP PROJECT</span>
+            <h2 data-i18n="projects.title">Linus Cargo – Digital Logistics Platform</h2>
+        </div>
+        <div class="project-card">
+            <div class="project-img"><img src="assets/img/project.png" alt="Linus Cargo"></div>
+            <div>
+                <h3>linuscargo.com</h3>
+                <p data-i18n="projects.desc">Platform digital cargo end‑to‑end: order management, tracking, integrasi API. Dibangun dari nol sebagai founder. Mencakup business process, frontend, dan workflow monitoring.</p>
+                <div>
+                    <span class="tech-badge">Laravel</span>
+                    <span class="tech-badge">REST API</span>
+                    <span class="tech-badge">Swagger</span>
+                    <span class="tech-badge">Frontend</span>
+                </div>
+                <a href="https://linuscargo.com" target="_blank" class="btn btn-primary" style="margin-top:30px; display:inline-block;" data-i18n="projects.btn">Visit Platform →</a>
+            </div>
+        </div>
+    </section>
 
-<!-- ================= CONTACT (dengan link aktif) ================= -->
-<section class="page" id="contact">
-  <div class="contact-box">
-    <i class="fas fa-paper-plane" style="font-size: 48px; color:#38bdf8;"></i>
-    <h2 style="font-size: 38px; margin: 20px 0 10px;">Let's Connect</h2>
-    <p>Terbuka untuk peluang profesional, kolaborasi operasional, maupun pengembangan digital logistics.</p>
-    
-    <div style="margin: 35px 0 25px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-      <!-- Email dengan link mailto -->
-      <a href="mailto:alfinilham301@gmail.com" class="contact-link">
-        <i class="fas fa-envelope"></i> alfinilham301@gmail.com
-      </a>
-      <!-- WhatsApp dengan link langsung chat -->
-      <a href="https://wa.me/6285963131098" target="_blank" class="contact-link">
-        <i class="fab fa-whatsapp"></i> +62 859-6313-1098
-      </a>
-      <!-- LinkedIn dengan link ke profil -->
-      <a href="https://linkedin.com/in/alfin-ilham-512188224" target="_blank" class="contact-link">
-        <i class="fab fa-linkedin"></i> linkedin.com/in/alfin-ilham
-      </a>
+    <!-- Education & Location -->
+    <div class="reveal" style="margin: 40px 0;">
+        <div class="section-header">
+            <span>← BACKGROUND</span>
+            <h2 data-i18n="bg.title">Pendidikan & Informasi</h2>
+        </div>
+        <div style="background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 32px; padding: 32px; border: 1px solid var(--border);">
+            <p data-i18n="bg.edu"><strong>🎓 Universitas Pelita Bangsa</strong> – Manajemen Ekonomi Bisnis (Konsentrasi MSDM)<br>2020 – 2025 (Cuti mulai semester 8) | IPK 3.37</p>
+            <p style="margin-top: 20px;"><strong data-i18n="bg.lang">🌐 Bahasa</strong><br><span data-i18n="lang.id">Bahasa Indonesia — Aktif</span><br><span data-i18n="lang.en">Bahasa Inggris — Intermediate (menengah)</span></p>
+            <p style="margin-top: 20px;"><strong data-i18n="bg.location">📍 Lokasi</strong><br><span data-i18n="location.value">Magelang, Jawa Tengah, Indonesia — siap relokasi / remote</span></p>
+        </div>
     </div>
-    
-    <div class="btn-group" style="justify-content: center;">
-      <a href="mailto:alfinilham301@gmail.com" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Email Me</a>
-      <a href="https://wa.me/6285963131098" class="btn btn-outline"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-    </div>
-  </div>
-</section>
 
-<footer>
-  <i class="fas fa-copyright"></i> 2026 ALFIN ILHAM — Supply Chain & Logistics Professional | ATS Ready Portfolio
-</footer>
+    <!-- Contact -->
+    <section id="contact" class="reveal">
+        <div class="contact-terminal">
+            <i class="fas fa-terminal" style="font-size: 2.8rem; color: var(--accent); margin-bottom: 20px;"></i>
+            <h2 data-i18n="contact.title">Mulai Percakapan Baru</h2>
+            <p data-i18n="contact.sub" style="margin-top: 12px;">Open for strategic roles, consulting, or digital transformation leadership.</p>
+            <div class="contact-links">
+                <a href="mailto:alfinilham301@gmail.com" class="contact-link"><i class="fas fa-envelope"></i> alfinilham301@gmail.com</a>
+                <a href="https://wa.me/6285963131098" target="_blank" class="contact-link"><i class="fab fa-whatsapp"></i> +62 859-6313-1098</a>
+                <a href="https://linkedin.com/in/alfin-ilham-512188224" target="_blank" class="contact-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+            </div>
+            <p style="margin-top: 28px; font-size: 0.85rem;" data-i18n="contact.location">📍 Magelang, Central Java, Indonesia — ready for relocation / remote</p>
+            <div style="margin-top: 20px;">
+                <a href="#" id="downloadCVFooter" class="btn btn-primary" style="background: var(--accent); display: inline-flex; gap: 8px;"><i class="fas fa-download"></i> <span data-i18n="resume">Download Resume (PDF)</span></a>
+            </div>
+        </div>
+    </section>
+
+    <footer>© 2026 Alfin Ilham — Cosmic ✦ Night / Dawn Portfolio | From Kenek to Digital Logistics Founder</footer>
+</main>
+
+<!-- Three.js 3D Background (Dynamic dan sesuai tema) -->
+<script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js" } }
+</script>
+<script type="module">
+    import * as THREE from 'three';
+
+    const canvas = document.getElementById('canvas-bg');
+    const scene = new THREE.Scene();
+    scene.background = null;
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 2, 12);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0);
+    canvas.appendChild(renderer.domElement);
+
+    // Lighting
+    const ambient = new THREE.AmbientLight(0x333344);
+    scene.add(ambient);
+    const mainLight = new THREE.DirectionalLight(0xffdd99, 1);
+    mainLight.position.set(2, 3, 4);
+    scene.add(mainLight);
+    const fillLight = new THREE.PointLight(0xffaa66, 0.5);
+    fillLight.position.set(-1, 1, 2);
+    scene.add(fillLight);
+
+    // central object – abstract cargo shape
+    const geometry = new THREE.IcosahedronGeometry(0.7, 0);
+    const materialGold = new THREE.MeshStandardMaterial({ color: 0xC9A87C, metalness: 0.7, roughness: 0.3 });
+    const core = new THREE.Mesh(geometry, materialGold);
+    scene.add(core);
+
+    // floating rings
+    const ringGroup = new THREE.Group();
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0x88a5c0, metalness: 0.5 });
+    for (let i = 0; i < 12; i++) {
+        const torus = new THREE.Mesh(new THREE.TorusGeometry(1.1, 0.05, 32, 100), ringMat);
+        torus.rotation.x = Math.PI / 2;
+        torus.rotation.z = (i / 12) * Math.PI * 2;
+        torus.position.set(Math.cos(i) * 0.9, Math.sin(i * 2) * 0.4, Math.sin(i) * 0.9);
+        ringGroup.add(torus);
+    }
+    scene.add(ringGroup);
+
+    // floating particles (cosmic dust)
+    const particleCount = 800;
+    const particleGeo = new THREE.BufferGeometry();
+    const posArray = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+        posArray[i*3] = (Math.random() - 0.5) * 18;
+        posArray[i*3+1] = (Math.random() - 0.5) * 8;
+        posArray[i*3+2] = (Math.random() - 0.5) * 18 - 5;
+    }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const particleMat = new THREE.PointsMaterial({ color: 0x88a5c0, size: 0.06, transparent: true, opacity: 0.5 });
+    const particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
+
+    // colors based on theme (dark/light) akan diupdate melalui event listener
+    function setThemeColors(isDark) {
+        const ringColor = isDark ? 0x88a5c0 : 0xE8A87C;
+        const particleColor = isDark ? 0x88a5c0 : 0xE8A87C;
+        ringGroup.children.forEach(child => child.material.color.setHex(ringColor));
+        particleMat.color.setHex(particleColor);
+        materialGold.color.setHex(isDark ? 0xC9A87C : 0xE8A87C);
+    }
+
+    // animate
+    let time = 0;
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.006;
+        core.rotation.y = time * 0.3;
+        core.rotation.x = Math.sin(time * 0.4) * 0.1;
+        ringGroup.rotation.y = time * 0.2;
+        ringGroup.rotation.x = Math.sin(time * 0.25) * 0.1;
+        particles.rotation.y = time * 0.02;
+        window.mouseX && (camera.position.x += ( (window.mouseX / window.innerWidth - 0.5) * 1.5 - camera.position.x ) * 0.03);
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+    }
+    animate();
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    window.addEventListener('mousemove', (e) => { window.mouseX = e.clientX; });
+    window.mouseX = 0;
+
+    // export function to be called on theme toggle
+    window.update3DTheme = setThemeColors;
+    setThemeColors(true);
+</script>
 
 <script>
-  function showPage(pageId) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+    // ========== LOADER ==========
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('loader');
+        gsap.to(loader, { opacity: 0, duration: 0.8, delay: 1.2, onComplete: () => { loader.style.display = 'none'; } });
+    });
+
+    // ========== MULTI LANGUAGE (ID/EN) ==========
+    const translations = {
+        id: {
+            nav: { home: "Beranda", exp: "Pengalaman", skills: "Keahlian", projects: "Proyek", contact: "Kontak" },
+            hero: { desc: "Profesional logistik dengan 6+ tahun pengalaman, dari asisten driver (kenek) hingga Supervisor Order Management dan Founder Linus Cargo. Menginisiasi sistem centralized vendor management berbasis spreadsheet yang memangkas personel dari ±14 menjadi 4–5 orang, serta membangun platform digital cargo dari nol." },
+            btn: { journey: "Lihat Perjalanan", contact: "Hubungi Saya" },
+            exp: {
+                title: "Dari Lapangan ke Digital Logistics",
+                kl: { role: "Asisten Driver → Transport Planning & 3PL Operations Staff", p1: "Mulai sebagai asisten driver (kenek), memahami operasional distribusi.", p2: "Maret 2020: dipercaya mengelola schedule driver & fleet management.", p3: "4 bulan kemudian pindah ke Vendor Management (3PL Operations).", p4: "Membantu pemenuhan armada eksternal sesuai permintaan warehouse.", p5: "Inisiasi sistem centralized vendor management berbasis spreadsheet otomatis – efisiensi order & monitoring.", p6: "Hasil: personel order, monitoring, invoice GR berkurang dari ±14 menjadi 4–5 orang.", p7: "Optimalisasi route planning & monitoring berbasis sistem." },
+                lidah: { role: "Supervisor Order Management", p1: "Mengelola distribusi hingga 4.500 ton per bulan, akurasi 98%.", p2: "Mengubah mindset staff: KPI, SLA, dan pentingnya WMS.", p3: "Mewajibkan komunikasi lintas departemen dalam grup (Sales, PPIC, BOA, Owner).", p4: "Mengawasi PPIC dalam MPS (Make to Stock) dan sinkronisasi Make to Order dengan shipdate.", p5: "Menginisiasi planning by maps untuk optimasi pengiriman." },
+                cargo: { role: "Founder & Digital Logistics Architect", p1: "Menginisiasi unit bisnis digital cargo atas instruksi owner (proyek mandek 1 tahun).", p2: "Merancang framework & business process, analisa SWOT kompetitor untuk pricing.", p3: "Mengembangkan website order & tracking (Laravel + VSCode), integrasi Swagger API.", p4: "Membuat SOP digital workflow, iklan promosi, kelola sosial media.", p5: "Mendorong transformasi logistik modern, transparan, dan efisien." }
+            },
+            skills: { title: "Soft · Hard · Digital Tools", soft: "Soft Skills", hard: "Hard Skills", software: "Software & Tools" },
+            projects: { title: "Linus Cargo – Platform Logistik Digital", desc: "Platform digital cargo end‑to‑end: order management, tracking, integrasi API. Dibangun dari nol sebagai founder.", btn: "Kunjungi Platform →" },
+            bg: { title: "Pendidikan & Informasi", edu: "🎓 Universitas Pelita Bangsa – Manajemen Ekonomi Bisnis (Konsentrasi MSDM)<br>2020 – 2025 (Cuti mulai semester 8) | IPK 3.37", lang: "🌐 Bahasa", location: "📍 Lokasi" },
+            lang: { id: "Bahasa Indonesia — Aktif", en: "Bahasa Inggris — Intermediate (menengah)" },
+            location: { value: "Magelang, Jawa Tengah, Indonesia — siap relokasi / remote" },
+            contact: { title: "Mulai Percakapan Baru", sub: "Terbuka untuk peran strategis, konsultasi transformasi digital, atau kolaborasi supply chain.", location: "📍 Magelang, Jawa Tengah, Indonesia — ready for relocation / remote" },
+            resume: "Resume"
+        },
+        en: {
+            nav: { home: "Home", exp: "Experience", skills: "Skills", projects: "Projects", contact: "Contact" },
+            hero: { desc: "Logistics professional with 6+ years of experience, from assistant driver (kenek) to Order Management Supervisor and Founder of Linus Cargo. Initiated a centralized vendor management system using automated spreadsheets, reducing operational headcount from ±14 to 4–5 people, and built a digital cargo platform from scratch." },
+            btn: { journey: "View Journey", contact: "Contact Me" },
+            exp: {
+                title: "From Field to Digital Logistics",
+                kl: { role: "Assistant Driver → Transport Planning & 3PL Operations Staff", p1: "Started as assistant driver (kenek), understanding ground-level distribution.", p2: "March 2020: promoted to schedule driver & fleet management.", p3: "Four months later moved to Vendor Management (3PL Operations).", p4: "Assisted in fulfilling external fleet requests per warehouse demand.", p5: "Initiated centralized vendor management system via automated spreadsheet – ordering & monitoring efficiency.", p6: "Result: personnel for order, monitoring, invoice GR reduced from ±14 to 4–5 people.", p7: "Involved in route planning & system-based monitoring optimization." },
+                lidah: { role: "Order Management Supervisor", p1: "Managed distribution of 4,500+ tons/month with 98% accuracy.", p2: "Transformed staff mindset: introduced KPI, SLA, and WMS importance.", p3: "Required cross‑department communication in groups (Sales, PPIC, BOA, Owner).", p4: "Oversaw PPIC in MPS (Make to Stock) and alignment of Make to Order with shipdate.", p5: "Initiated planning by maps for delivery optimization." },
+                cargo: { role: "Founder & Digital Logistics Architect", p1: "Initiated digital cargo business unit upon owner's instruction (project stalled for 1 year).", p2: "Designed framework & business process, competitor SWOT analysis for pricing.", p3: "Developed order & tracking website (Laravel + VSCode), integrated Swagger API.", p4: "Created digital workflow SOP, ads, and social media management.", p5: "Driving modern, transparent, and efficient logistics transformation." }
+            },
+            skills: { title: "Soft · Hard · Digital Tools", soft: "Soft Skills", hard: "Hard Skills", software: "Software & Tools" },
+            projects: { title: "Linus Cargo – Digital Logistics Platform", desc: "End‑to‑end digital cargo platform: order management, tracking, API integration. Built from zero as founder.", btn: "Visit Platform →" },
+            bg: { title: "Education & Information", edu: "🎓 Universitas Pelita Bangsa – Business Economics (HR Concentration)<br>2020 – 2025 (off from semester 8) | GPA 3.37", lang: "🌐 Languages", location: "📍 Location" },
+            lang: { id: "Bahasa Indonesia — Active", en: "English — Intermediate" },
+            location: { value: "Magelang, Central Java, Indonesia — ready for relocation / remote" },
+            contact: { title: "Start a new conversation", sub: "Open for strategic roles, digital transformation consulting, or supply chain collaboration.", location: "📍 Magelang, Central Java, Indonesia — ready for relocation / remote" },
+            resume: "Resume"
+        }
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'id';
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('lang', lang);
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const value = key.split('.').reduce((o, k) => o?.[k], translations[lang]);
+            if (value !== undefined && value !== null) {
+                if (el.tagName === 'INPUT') el.placeholder = value;
+                else el.innerHTML = value;
+            }
+        });
+        document.getElementById('langID').classList.toggle('active', lang === 'id');
+        document.getElementById('langEN').classList.toggle('active', lang === 'en');
+    }
+    document.getElementById('langID').addEventListener('click', () => setLanguage('id'));
+    document.getElementById('langEN').addEventListener('click', () => setLanguage('en'));
+    setLanguage(currentLang);
+
+    // ========== THEME TOGGLE ==========
+    const body = document.body;
+    const toggleBtn = document.getElementById('themeToggle');
+    const icon = toggleBtn.querySelector('i');
+    function updateTheme() {
+        const isDark = body.classList.contains('dark');
+        icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+        if (window.update3DTheme) window.update3DTheme(isDark);
+    }
+    if (localStorage.getItem('theme') === 'light') body.classList.remove('dark'), body.classList.add('light');
+    else body.classList.add('dark'), body.classList.remove('light');
+    updateTheme();
+    toggleBtn.addEventListener('click', () => {
+        if (body.classList.contains('dark')) {
+            body.classList.remove('dark'); body.classList.add('light');
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.classList.add('dark'); body.classList.remove('light');
+            localStorage.setItem('theme', 'dark');
+        }
+        updateTheme();
+    });
+
+    // Download CV placeholder
+    document.querySelectorAll('#downloadCV, #downloadCVFooter').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('📄 Silakan ganti link dengan file CV/resume Anda.\nContoh: href="assets/Alfin_Ilham_CV.pdf"');
+        });
+    });
+
+    // GSAP Scroll Reveal
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.reveal').forEach(el => {
+        gsap.set(el, { opacity: 0, y: 55 });
+        ScrollTrigger.create({ trigger: el, start: 'top 85%', onEnter: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }), once: true });
+    });
+
+    // 3D photo effect
+    const photoFrame = document.querySelector('.photo-frame');
+    if (photoFrame) {
+        photoFrame.addEventListener('mousemove', (e) => {
+            const rect = photoFrame.getBoundingClientRect();
+            const x = e.clientX - rect.left, y = e.clientY - rect.top;
+            const rotY = ((x / rect.width) - 0.5) * 18, rotX = ((y / rect.height) - 0.5) * -18;
+            photoFrame.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
+        });
+        photoFrame.addEventListener('mouseleave', () => photoFrame.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)');
+    }
 </script>
 </body>
 </html>
