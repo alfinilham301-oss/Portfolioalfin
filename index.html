@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Alfin Ilham · Cosmic Logistics</title>
+    <title>Alfin Ilham · Cosmic Supply Chain</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <!-- GSAP & Three.js -->
+    <!-- GSAP -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
     <style>
@@ -17,32 +17,34 @@
             box-sizing: border-box;
         }
 
-        /* ========== DARK COSMIC NIGHT ========== */
+        /* ========== DARK MODE · COSMIC NIGHT ========== */
         body.dark {
-            --bg-primary: #0b1838;
-            --text-primary: #F8FAFE;
-            --text-secondary: #c8ddf5;
-            --accent: #88a5c0;
-            --accent-strong: #3a60a0;
-            --card-bg: rgba(20, 35, 65, 0.6);
-            --border: rgba(136, 165, 192, 0.35);
-            --photo-overlay: linear-gradient(135deg, rgba(136,165,192,0.25), rgba(0,0,0,0.4));
-            --skill-bg: rgba(136,165,192,0.15);
-            --heading-gradient: linear-gradient(135deg, #FFFFFF, #88a5c0);
+            --bg-primary: #05070a;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --accent-blue: #3b82f6;
+            --accent-pink: #ec4899;
+            --accent-purple: #a855f7;
+            --card-bg: rgba(10, 15, 25, 0.65);
+            --border: rgba(59, 130, 246, 0.3);
+            --shadow: 0 25px 40px -12px rgba(0,0,0,0.6);
+            --gradient-hero: linear-gradient(135deg, #3b82f6, #ec4899, #a855f7);
+            --vignette: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 120%);
         }
 
-        /* ========== LIGHT COSMIC DAWN ========== */
+        /* ========== LIGHT MODE · COSMIC DAWN ========== */
         body.light {
-            --bg-primary: #FEF7F0;
-            --text-primary: #3D2A1F;
-            --text-secondary: #7A5A4A;
-            --accent: #E8A87C;
-            --accent-strong: #C38D6B;
-            --card-bg: rgba(255, 252, 245, 0.8);
-            --border: #F2E0CE;
-            --photo-overlay: linear-gradient(135deg, rgba(232,168,124,0.12), rgba(200,140,100,0.05));
-            --skill-bg: rgba(232,168,124,0.12);
-            --heading-gradient: linear-gradient(135deg, #C38D6B, #E8A87C);
+            --bg-primary: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #1e293b;
+            --accent-blue: #2563eb;
+            --accent-pink: #db2777;
+            --accent-purple: #9333ea;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border: rgba(37, 99, 235, 0.25);
+            --shadow: 0 25px 40px -12px rgba(0,0,0,0.1);
+            --gradient-hero: linear-gradient(135deg, #2563eb, #db2777, #9333ea);
+            --vignette: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.1) 120%);
         }
 
         body {
@@ -53,78 +55,103 @@
             overflow-x: hidden;
         }
 
-        /* Canvas 3D Background */
+        /* Abstract blur background */
+        .abstract-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .blob {
+            position: absolute;
+            filter: blur(100px);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: floatBlob 20s infinite alternate ease-in-out;
+        }
+        body.dark .blob { opacity: 0.35; }
+        body.light .blob { opacity: 0.2; }
+        .blob-1 { width: 60vw; height: 60vw; background: #3b82f6; top: -20vh; left: -20vw; animation-duration: 25s; }
+        .blob-2 { width: 50vw; height: 50vw; background: #ec4899; bottom: -10vh; right: -10vw; animation-duration: 20s; }
+        .blob-3 { width: 40vw; height: 40vw; background: #a855f7; top: 40vh; left: 60vw; animation-duration: 30s; }
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5%, 5%) scale(1.1); }
+        }
+
+        /* Canvas 3D */
         #canvas-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -2;
+            z-index: -1;
             pointer-events: none;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
-        body.dark ::-webkit-scrollbar-track { background: #1A2545; }
-        body.light ::-webkit-scrollbar-track { background: #EDE0D4; }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 10px; }
 
-        /* LOADER */
+        /* Loader */
         #loader {
             position: fixed;
             inset: 0;
-            z-index: 9999;
+            z-index: 10000;
             background: var(--bg-primary);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.8s ease, visibility 0.8s;
+            transition: opacity 0.8s ease;
         }
-        .loader-ring {
-            width: 80px;
-            height: 80px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid var(--accent);
+        .loader-cosmic {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 24px;
+            background: conic-gradient(var(--accent-blue) 0deg 90deg, var(--accent-pink) 90deg 180deg, var(--accent-purple) 180deg 270deg, transparent 270deg);
+            mask: radial-gradient(circle, transparent 60%, black 61%);
+            animation: spinCosmic 1s infinite linear;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .loader-text {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            color: var(--accent);
-        }
+        @keyframes spinCosmic { 100% { transform: rotate(360deg); } }
 
-        /* NAVBAR */
+        /* Navbar */
         .navbar {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 1250px;
+            max-width: 1300px;
             padding: 12px 28px;
-            border-radius: 100px;
+            border-radius: 80px;
             background: var(--card-bg);
-            backdrop-filter: blur(18px);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             z-index: 1000;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
         }
         .logo {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Space Grotesk';
             font-weight: 800;
-            font-size: 1.3rem;
-            background: var(--heading-gradient);
+            font-size: 1.4rem;
+            background: var(--gradient-hero);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
+            animation: pulseLogo 3s infinite;
+        }
+        @keyframes pulseLogo {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; text-shadow: 0 0 10px rgba(59,130,246,0.5); }
         }
         .nav-links { display: flex; gap: 32px; }
         .nav-links a {
@@ -132,32 +159,37 @@
             font-weight: 600;
             color: var(--text-primary);
             transition: 0.2s;
-            font-size: 0.9rem;
+            position: relative;
         }
-        .nav-links a:hover { color: var(--accent); }
-        .open-to-work {
-            background: rgba(136,165,192,0.2);
-            border: 1px solid var(--accent);
-            padding: 6px 14px;
-            border-radius: 60px;
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--accent-pink);
+            transition: 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .badge-open {
+            background: var(--accent-blue);
+            padding: 6px 16px;
+            border-radius: 40px;
             font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--accent);
+            font-weight: 800;
+            color: white;
+            animation: pulseBadge 2s infinite;
+        }
+        @keyframes pulseBadge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(59,130,246,0); }
         }
         .nav-actions { display: flex; gap: 12px; align-items: center; }
-        .icon-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            color: var(--text-primary);
-            cursor: pointer;
-        }
         .lang-select {
             display: flex;
             gap: 6px;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.08);
             border-radius: 60px;
             padding: 4px 12px;
         }
@@ -170,708 +202,785 @@
             padding: 4px 10px;
             border-radius: 40px;
             font-size: 0.7rem;
+            transition: 0.2s;
         }
-        .lang-btn.active { background: var(--accent); color: #0a0a1a; }
+        .lang-btn.active { background: var(--accent-blue); color: white; }
+        .icon-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .icon-btn:hover { transform: rotate(15deg); }
         .download-btn {
-            background: var(--accent);
-            color: #0A0C1A;
-            padding: 8px 18px;
+            background: var(--accent-purple);
+            color: white;
+            padding: 8px 22px;
             border-radius: 60px;
-            text-decoration: none;
             font-weight: 700;
             font-size: 0.75rem;
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: 0.2s;
         }
-
+        .download-btn:hover { transform: scale(1.05); background: var(--accent-pink); }
         .container { width: 90%; max-width: 1300px; margin: 0 auto; padding: 20px 0; }
 
-        /* HERO */
+        /* Hero */
         .hero {
             min-height: 90vh;
             display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
+            grid-template-columns: 1.2fr 0.8fr;
             align-items: center;
-            gap: 60px;
-            padding: 120px 0 60px;
+            gap: 50px;
+            padding: 140px 0 60px;
         }
         .hero-left h1 {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: 'Space Grotesk';
             font-size: 5rem;
             font-weight: 800;
-            line-height: 1.05;
-            background: var(--heading-gradient);
+            line-height: 1.1;
+            background: var(--gradient-hero);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+        .hero-left .highlight {
+            display: inline-block;
+            background: var(--accent-blue);
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: white;
+            animation: fadeInUp 0.8s ease;
         }
         .hero-left p {
-            margin: 30px 0;
+            margin: 25px 0;
             line-height: 1.7;
             color: var(--text-secondary);
+            animation: fadeInUp 1s ease 0.2s both;
         }
         .btn-group {
             display: flex;
-            gap: 18px;
+            gap: 20px;
             flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s both;
         }
         .btn {
-            padding: 14px 32px;
+            padding: 12px 30px;
             border-radius: 60px;
             font-weight: 700;
-            text-decoration: none;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-primary { background: var(--accent); color: #0a0a1a; }
-        .btn-outline { border: 2px solid var(--accent); background: transparent; color: var(--accent); }
-        .btn:hover { transform: translateY(-4px); filter: brightness(1.05); }
-
-        .hero-photo { position: relative; }
-        .photo-frame {
-            background: rgba(0,0,0,0.2);
-            border-radius: 38px;
-            padding: 10px;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(4px);
-            position: relative;
-            overflow: hidden;
-        }
-        .photo-frame::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--photo-overlay);
-            pointer-events: none;
-            border-radius: 30px;
-        }
-        .photo-frame img {
-            width: 100%;
-            border-radius: 30px;
-            display: block;
-        }
-        .floating-tag {
-            position: absolute;
-            bottom: 20px;
-            left: -15px;
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            padding: 12px 20px;
-            border-radius: 24px;
-            border-left: 4px solid var(--accent);
-            font-family: monospace;
-            font-weight: 600;
-        }
-
-        /* Section header */
-        .section-header {
-            margin-bottom: 60px;
-            border-left: 6px solid var(--accent);
-            padding-left: 28px;
-        }
-        .section-header span {
-            font-size: 0.85rem;
-            letter-spacing: 4px;
-            font-weight: 700;
-            color: var(--accent);
-            text-transform: uppercase;
-        }
-        .section-header h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 3rem;
-            font-weight: 800;
-            margin-top: 12px;
-            letter-spacing: -0.5px;
-            background: var(--heading-gradient);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        /* Timeline (sama seperti sebelumnya) */
-        .timeline {
-            position: relative;
-            padding-left: 40px;
-        }
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 12px;
-            top: 8px;
-            bottom: 0;
-            width: 2px;
-            background: var(--accent);
-            opacity: 0.4;
-        }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 70px;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 35px;
-            align-items: start;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -35px;
-            top: 24px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 15px var(--accent);
-        }
-        .timeline-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 28px;
-            padding: 28px;
-            border: 1px solid var(--border);
-        }
-        .timeline-card h3 {
-            font-size: 1.7rem;
-            font-weight: 800;
-            margin: 10px 0 4px;
-            background: var(--heading-gradient);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-        .timeline-card ul { margin-top: 18px; padding-left: 22px; }
-        .timeline-card li { margin-bottom: 10px; color: var(--text-secondary); }
-        .timeline-img {
-            background: rgba(0,0,0,0.2);
-            border-radius: 24px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            aspect-ratio: 16 / 10;
-            position: relative;
-        }
-        .timeline-img::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--photo-overlay);
-            pointer-events: none;
-        }
-        .timeline-img img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Skills 3 kategori */
-        .skills-categories { display: flex; flex-direction: column; gap: 40px; }
-        .skill-category h3 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--accent);
-        }
-        .skills-grid { display: flex; flex-wrap: wrap; gap: 16px; }
-        .skill-pill {
-            background: var(--skill-bg);
-            border: 1px solid var(--border);
-            padding: 12px 24px;
-            border-radius: 100px;
-            font-weight: 600;
-            color: var(--text-primary);
+            transition: 0.25s;
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
-        .skill-pill i { color: var(--accent); }
-        .skill-pill:hover { background: var(--accent); color: #0a0a1a; transform: translateY(-3px); }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.2);
+            transition: 0.4s;
+            z-index: -1;
+        }
+        .btn:hover::before { left: 0; }
+        .btn-primary { background: var(--accent-blue); color: white; box-shadow: 0 4px 14px rgba(59,130,246,0.4); }
+        .btn-outline { border: 2px solid var(--accent-pink); background: transparent; color: var(--accent-pink); }
+        .btn:hover { transform: translateY(-4px); filter: brightness(1.05); }
 
-        /* Project */
-        .project-card {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 45px;
+        .hero-photo { position: relative; animation: fadeInRight 1s ease; }
+        .photo-card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
             border-radius: 40px;
-            padding: 32px;
-            align-items: center;
+            padding: 12px;
             border: 1px solid var(--border);
-        }
-        .project-img {
-            border-radius: 28px;
-            overflow: hidden;
+            transition: all 0.3s;
             position: relative;
+            animation: floatPhoto 4s infinite ease-in-out;
         }
-        .project-img::after {
+        @keyframes floatPhoto {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .photo-card img {
+            width: 100%;
+            border-radius: 32px;
+            display: block;
+        }
+        .photo-card::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: var(--photo-overlay);
+            border-radius: 32px;
+            pointer-events: none;
+            background: var(--vignette);
         }
-        .project-img img { width: 100%; border-radius: 28px; }
-        .tech-badge {
-            display: inline-block;
-            background: rgba(136,165,192,0.25);
-            padding: 6px 14px;
-            border-radius: 60px;
-            font-size: 0.7rem;
-            margin-right: 10px;
-            margin-top: 16px;
-            color: var(--accent);
+        .floating-badge {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            background: var(--gradient-hero);
+            padding: 16px 24px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 800;
+            box-shadow: var(--shadow);
+            animation: pulseBadge 2s infinite;
         }
 
-        /* Contact */
-        .contact-terminal {
-            text-align: center;
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Section Header */
+        .section-header {
+            margin-bottom: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .section-header-left span {
+            font-size: 0.8rem;
+            letter-spacing: 5px;
+            font-weight: 700;
+            color: var(--accent-pink);
+            text-transform: uppercase;
+        }
+        .section-header-left h2 {
+            font-family: 'Space Grotesk';
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-top: 10px;
+            background: var(--gradient-hero);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        /* Experience Cards - hover effect 3D */
+        .exp-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .exp-card {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
             background: var(--card-bg);
             backdrop-filter: blur(12px);
             border-radius: 48px;
-            padding: 60px 40px;
+            padding: 32px;
             border: 1px solid var(--border);
-            transition: transform 0.3s;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
-        .contact-terminal:hover { transform: scale(1.01); }
-        .contact-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 35px 0; }
-        .contact-link {
-            background: rgba(255,255,255,0.08);
-            padding: 12px 26px;
+        .exp-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            border-color: var(--accent-purple);
+            box-shadow: var(--shadow);
+        }
+        .exp-date {
+            font-family: monospace;
+            font-weight: 800;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+        }
+        .exp-card h3 { font-size: 1.6rem; margin: 8px 0; }
+        .exp-card ul { padding-left: 22px; margin-top: 16px; }
+        .exp-card li { margin-bottom: 10px; color: var(--text-secondary); }
+        .exp-icon {
+            background: var(--bg-primary);
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: var(--accent-pink);
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .exp-card:hover .exp-icon { transform: scale(1.05); color: var(--accent-blue); }
+
+        /* Skills pills with bounce */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 50px;
+            justify-content: space-between;
+        }
+        .skill-group h3 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            color: var(--accent-purple);
+        }
+        .pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .pill {
+            background: rgba(59,130,246,0.15);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
             border-radius: 60px;
+            font-weight: 500;
+            transition: 0.3s;
+            cursor: default;
+        }
+        .pill:hover {
+            background: var(--accent-blue);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(59,130,246,0.4);
+        }
+
+        /* Project Card */
+        .project-card {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 50px;
+            background: var(--card-bg);
+            border-radius: 56px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            transition: 0.4s;
+        }
+        .project-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+        .project-icon {
+            background: var(--bg-primary);
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: var(--accent-blue);
+            animation: pulseIcon 3s infinite;
+        }
+        @keyframes pulseIcon {
+            0%, 100% { text-shadow: 0 0 0 rgba(59,130,246,0); }
+            50% { text-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        }
+        .tech-stack span {
+            display: inline-block;
+            background: rgba(236,72,153,0.2);
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            margin-right: 12px;
+            margin-top: 16px;
+            transition: 0.2s;
+        }
+        .tech-stack span:hover { background: var(--accent-pink); color: white; transform: translateY(-2px); }
+
+        /* Contact */
+        .contact-cosmic {
+            text-align: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 56px;
+            padding: 70px 40px;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .contact-cosmic:hover { transform: scale(1.01); }
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+        .contact-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px 28px;
+            border-radius: 60px;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .contact-item a {
             text-decoration: none;
             color: var(--text-primary);
             font-weight: 600;
-            border: 1px solid var(--border);
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
-        .contact-link:hover { background: var(--accent); color: #0a0a1a; }
-        footer { text-align: center; padding: 40px 0; border-top: 1px solid var(--border); margin-top: 20px; }
+        .contact-item:hover { background: var(--accent-blue); transform: translateY(-3px); a { color: white; } }
 
-        .reveal { opacity: 0; transform: translateY(50px); }
-        @media (max-width: 980px) {
-            .hero { grid-template-columns: 1fr; text-align: center; gap: 40px; }
-            .hero-left h1 { font-size: 3.2rem; }
-            .nav-links { display: none; }
-            .timeline-item { grid-template-columns: 1fr; gap: 20px; }
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            margin-top: 50px;
+        }
+        .reveal { opacity: 0; transform: translateY(40px); transition: 0.8s cubic-bezier(0.2,0.9,0.4,1.1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        @media (max-width: 1000px) {
+            .hero { grid-template-columns: 1fr; text-align: center; }
+            .hero-left h1 { font-size: 3rem; }
+            .exp-card { grid-template-columns: 1fr; }
             .project-card { grid-template-columns: 1fr; }
-            .section-header h2 { font-size: 2rem; }
-            .floating-tag { left: 5px; bottom: -8px; width: 90%; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body class="dark">
-<canvas id="canvas-bg"></canvas>
-
-<!-- Loader -->
-<div id="loader">
-    <div class="loader-ring"></div>
-    <div class="loader-text" id="loaderText">✦ WELCOME TO ALFIN'S PORTFOLIO ✦</div>
-</div>
-
-<!-- Navbar -->
-<nav class="navbar">
-    <div class="logo">✦ ALFIN ILHAM</div>
-    <div class="nav-links">
-        <a href="#home" data-i18n="nav.home">Home</a>
-        <a href="#experience" data-i18n="nav.exp">Experience</a>
-        <a href="#skills" data-i18n="nav.skills">Skills</a>
-        <a href="#projects" data-i18n="nav.projects">Projects</a>
-        <a href="#contact" data-i18n="nav.contact">Contact</a>
+    <div class="abstract-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
     </div>
-    <div class="nav-actions">
-        <div class="open-to-work"><i class="fas fa-badge-check"></i> #OpenToWork</div>
-        <div class="lang-select">
-            <button class="lang-btn" id="langID">🇮🇩 ID</button>
-            <button class="lang-btn" id="langEN">🇬🇧 EN</button>
-        </div>
-        <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
-        <a href="#" id="downloadCV" class="download-btn"><i class="fas fa-download"></i> <span data-i18n="resume">Resume</span></a>
-    </div>
-</nav>
+    <canvas id="canvas-bg"></canvas>
+    <div id="loader"><div class="loader-cosmic"></div></div>
 
-<main class="container">
-    <!-- Hero -->
-    <section id="home" class="hero reveal">
-        <div class="hero-left">
-            <h1>ALFIN ILHAM</h1>
-            <p data-i18n="hero.desc">Profesional logistik dengan 6+ tahun pengalaman, dari asisten driver (kenek) hingga Supervisor Order Management dan Founder Linus Cargo. Menginisiasi sistem centralized vendor management berbasis spreadsheet yang memangkas personel dari ±14 menjadi 4–5 orang, serta membangun platform digital cargo dari nol.</p>
-            <div class="btn-group">
-                <a href="#experience" class="btn btn-primary" data-i18n="btn.journey">Lihat Perjalanan</a>
-                <a href="#contact" class="btn btn-outline" data-i18n="btn.contact">Hubungi Saya</a>
-            </div>
+    <nav class="navbar">
+        <div class="logo">✦ ALFIN ILHAM</div>
+        <div class="nav-links">
+            <a href="#home" data-i18n="nav.home">Home</a>
+            <a href="#experience" data-i18n="nav.exp">Experience</a>
+            <a href="#skills" data-i18n="nav.skills">Skills</a>
+            <a href="#projects" data-i18n="nav.projects">Projects</a>
+            <a href="#contact" data-i18n="nav.contact">Contact</a>
         </div>
-        <div class="hero-photo">
-            <div class="photo-frame">
-                <img src="assets/img/profil.png" alt="Alfin Ilham">
+        <div class="nav-actions">
+            <div class="badge-open"><i class="fas fa-bolt"></i> #OpenToWork</div>
+            <div class="lang-select">
+                <button class="lang-btn active" id="langID">🇮🇩 ID</button>
+                <button class="lang-btn" id="langEN">🇬🇧 EN</button>
             </div>
-            <div class="floating-tag"><i class="fas fa-charging-station"></i> Kenek → Supervisor → Founder</div>
+            <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+            <a href="assets/Alfin_Ilham_Resume.pdf" download class="download-btn"><i class="fas fa-file-pdf"></i> <span data-i18n="resume">Resume</span></a>
         </div>
-    </section>
+    </nav>
 
-    <!-- Experience Timeline -->
-    <section id="experience" class="reveal">
-        <div class="section-header">
-            <span>← JOURNEY</span>
-            <h2 data-i18n="exp.title">Dari Lapangan ke Digital Logistics</h2>
-        </div>
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-card">
-                    <span style="color:var(--accent);font-weight:800;">AGUSTUS 2019 – JUNI 2025</span>
-                    <h3>PT Kawan Lama Group</h3>
-                    <p data-i18n="exp.kl.role">Asisten Driver → Transport Planning & 3PL Operations Staff</p>
-                    <ul>
-                        <li data-i18n="exp.kl.p1">Mulai sebagai asisten driver (kenek), memahami operasional distribusi.</li>
-                        <li data-i18n="exp.kl.p2">Maret 2020: dipercaya mengelola schedule driver & fleet management.</li>
-                        <li data-i18n="exp.kl.p3">4 bulan kemudian pindah ke Vendor Management (3PL Operations).</li>
-                        <li data-i18n="exp.kl.p4">Membantu pemenuhan armada eksternal sesuai permintaan warehouse.</li>
-                        <li data-i18n="exp.kl.p5"><strong>Inisiasi sistem centralized vendor management berbasis spreadsheet otomatis</strong> – efisiensi order & monitoring.</li>
-                        <li data-i18n="exp.kl.p6">Hasil: personel order, monitoring, invoice GR berkurang dari ±14 menjadi 4–5 orang.</li>
-                        <li data-i18n="exp.kl.p7">Optimalisasi route planning & monitoring berbasis sistem.</li>
-                    </ul>
+    <main class="container">
+        <section id="home" class="hero reveal">
+            <div class="hero-left">
+                <div class="highlight"><i class="fas fa-charging-station"></i> <span data-i18n="hero.badge">Supply Chain + Digital Innovation</span></div>
+                <h1>ALFIN ILHAM</h1>
+                <p data-i18n="hero.desc">Profesional di bidang Supply Chain dan Logistik dengan pengalaman lebih dari 6 tahun dalam operasional distribusi, manajemen vendor (3PL), dan perencanaan transportasi. Memiliki rekam jejak yang konsisten dalam mengelola kelancaran rantai pasok, mengevaluasi kinerja vendor expedisi, serta memimpin tim lintas departemen untuk mencapai target operasional harian. Selain keahlian logistik inti, memiliki nilai tambah dalam mengintegrasikan proses operasional konvensional dengan solusi teknologi digital, mencakup pengembangan sistem berbasis web, integrasi API, dan strategi digital marketing untuk mendukung ekspansi bisnis perusahaan.</p>
+                <div class="btn-group">
+                    <a href="#experience" class="btn btn-primary" data-i18n="btn.journey"><i class="fas fa-timeline"></i> Perjalanan</a>
+                    <a href="#contact" class="btn btn-outline" data-i18n="btn.contact"><i class="fas fa-paper-plane"></i> Hubungi</a>
                 </div>
-                <div class="timeline-img"><img src="assets/img/KLG.PNG" alt="Kawan Lama"></div>
             </div>
-            <div class="timeline-item">
-                <div class="timeline-card">
-                    <span style="color:var(--accent);font-weight:800;">JUNI 2025 – SEKARANG</span>
-                    <h3>PT Lidah Buaya Group (Linus Logistics)</h3>
-                    <p data-i18n="exp.lidah.role">Supervisor Order Management</p>
-                    <ul>
-                        <li data-i18n="exp.lidah.p1">Mengelola distribusi hingga 4.500 ton per bulan, akurasi 98%.</li>
-                        <li data-i18n="exp.lidah.p2">Mengubah mindset staff: KPI, SLA, dan pentingnya WMS.</li>
-                        <li data-i18n="exp.lidah.p3">Mewajibkan komunikasi lintas departemen dalam grup (Sales, PPIC, BOA, Owner).</li>
-                        <li data-i18n="exp.lidah.p4">Mengawasi PPIC dalam MPS (Make to Stock) dan sinkronisasi Make to Order dengan shipdate.</li>
-                        <li data-i18n="exp.lidah.p5">Menginisiasi planning by maps untuk optimasi pengiriman.</li>
-                    </ul>
+            <div class="hero-photo">
+                <div class="photo-card">
+                    <img src="assets/img/PROFIL.PNG" alt="Alfin Ilham">
                 </div>
-                <div class="timeline-img"><img src="assets/img/BG.PNG" alt="Lidah Buaya"></div>
+                <div class="floating-badge"><i class="fas fa-rocket"></i> From Field → Digital</div>
             </div>
-            <div class="timeline-item">
-                <div class="timeline-card">
-                    <span style="color:var(--accent);font-weight:800;">APRIL 2025 – SEKARANG</span>
-                    <h3>Linus Cargo</h3>
-                    <p data-i18n="exp.cargo.role">Founder & Digital Logistics Architect</p>
-                    <ul>
-                        <li data-i18n="exp.cargo.p1">Menginisiasi unit bisnis digital cargo atas instruksi owner (proyek mandek 1 tahun).</li>
-                        <li data-i18n="exp.cargo.p2">Merancang framework & business process, analisa SWOT kompetitor untuk pricing.</li>
-                        <li data-i18n="exp.cargo.p3">Mengembangkan website order & tracking (Laravel + VSCode), integrasi Swagger API.</li>
-                        <li data-i18n="exp.cargo.p4">Membuat SOP digital workflow, iklan promosi, kelola sosial media.</li>
-                        <li data-i18n="exp.cargo.p5">Mendorong transformasi logistik modern, transparan, dan efisien.</li>
-                    </ul>
-                </div>
-                <div class="timeline-img"><img src="assets/img/LC.PNG" alt="Linus Cargo"></div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Skills (Soft, Hard, Software) -->
-    <section id="skills" class="reveal">
-        <div class="section-header">
-            <span>← CORE COMPETENCIES</span>
-            <h2 data-i18n="skills.title">Soft · Hard · Digital Tools</h2>
-        </div>
-        <div class="skills-categories">
-            <div class="skill-category">
-                <h3><i class="fas fa-heart"></i> <span data-i18n="skills.soft">Soft Skills</span></h3>
-                <div class="skills-grid">
-                    <div class="skill-pill"><i class="fas fa-users"></i> Leadership & Coordination</div>
-                    <div class="skill-pill"><i class="fas fa-comments"></i> Cross-functional Communication</div>
-                    <div class="skill-pill"><i class="fas fa-brain"></i> Strategic Problem Solving</div>
-                    <div class="skill-pill"><i class="fas fa-chart-line"></i> Data‑Driven Decision Making</div>
+        <section id="experience" class="reveal">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <span>← CAREER PATH</span>
+                    <h2 data-i18n="exp.title">Pengalaman Kerja</h2>
                 </div>
             </div>
-            <div class="skill-category">
-                <h3><i class="fas fa-cogs"></i> <span data-i18n="skills.hard">Hard Skills</span></h3>
-                <div class="skills-grid">
-                    <div class="skill-pill"><i class="fas fa-warehouse"></i> Supply Chain Management</div>
-                    <div class="skill-pill"><i class="fas fa-truck-fast"></i> Distribution & Transport Planning</div>
-                    <div class="skill-pill"><i class="fas fa-handshake"></i> Vendor 3PL Management</div>
-                    <div class="skill-pill"><i class="fas fa-chart-simple"></i> KPI / SLA Monitoring</div>
-                    <div class="skill-pill"><i class="fas fa-arrows-spin"></i> Workflow & Process Improvement</div>
-                    <div class="skill-pill"><i class="fas fa-microchip"></i> Digital Logistics Systems</div>
+            <div class="exp-grid">
+                <div class="exp-card">
+                    <div>
+                        <div class="exp-date">JUNI 2025 – SEKARANG</div>
+                        <h3>Supervisor Order Management</h3>
+                        <p>Lidah Buaya Group Company - PT Lintas Usahatama Logistik</p>
+                        <ul>
+                            <li data-i18n="exp.lidah.l1">Memimpin dan mengelola perencanaan jadwal pengiriman untuk memastikan seluruh proses distribusi berjalan sesuai dengan target perusahaan baik secara kuantitas dan kualitas.</li>
+                            <li data-i18n="exp.lidah.l2">Mengkoordinasikan Master Production Schedule (MPS) melalui evaluasi berkala bersama departemen Sales dan PPIC guna menyelaraskan kapasitas produksi dengan ketersediaan ruang penyimpanan.</li>
+                            <li data-i18n="exp.lidah.l3">Menjaga keseimbangan inventaris gudang dan meminimalisir penumpukan barang dengan mendorong percepatan distribusi produk slow-moving bersama tim Sales.</li>
+                            <li data-i18n="exp.lidah.l4">Memonitor indikator On-Time Delivery (OTD) secara harian dengan mengawasi ketat jadwal pengiriman (ship date) dan kesiapan operasional armada.</li>
+                        </ul>
+                    </div>
+                    <div class="exp-icon"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="exp-card">
+                    <div>
+                        <div class="exp-date">APRIL 2026 – SEKARANG</div>
+                        <h3>Project Development – Linus Cargo</h3>
+                        <p>Lidah Buaya Group Company</p>
+                        <ul>
+                            <li data-i18n="exp.cargo.l1">Merancang framework operasional dan Standard Operating Procedure (SOP) secara komprehensif untuk peluncuran unit bisnis baru, Linus Cargo.</li>
+                            <li data-i18n="exp.cargo.l2">Mengembangkan front-end situs web logistik perusahaan menggunakan Laravel PHP dan mengeksekusi integrasi dengan API Swagger untuk kebutuhan aplikasi order dan pelacakan berbasis web.</li>
+                            <li data-i18n="exp.cargo.l3">Mendukung strategi penetrasi pasar melalui pengelolaan kampanye digital marketing menggunakan Google Ads dan optimalisasi aset media sosial perusahaan.</li>
+                        </ul>
+                    </div>
+                    <div class="exp-icon"><i class="fas fa-laptop-code"></i></div>
+                </div>
+                <div class="exp-card">
+                    <div>
+                        <div class="exp-date">AGUSTUS 2019 – JUNI 2024</div>
+                        <h3>3PL Operation Staff – Vendor Management</h3>
+                        <p>Kawan Lama Group</p>
+                        <ul>
+                            <li data-i18n="exp.kl.l1">Memulai karier operasional lapangan (Assistant Driver) hingga dipercaya untuk mengelola Fleet Manajemen dan Vendor Management secara penuh.</li>
+                            <li data-i18n="exp.kl.l2">Merencanakan penjadwalan harian, memplot armada, dan mengelola alokasi unit dari vendor 3PL untuk memastikan seluruh pemenuhan permintaan pengiriman warehouse terpenuhi.</li>
+                            <li data-i18n="exp.kl.l3">Mengevaluasi kinerja vendor 3PL secara berkala berdasarkan metrik pencapaian tingkat pemenuhan unit (fulfillment unit), ketepatan waktu kedatangan (on-time arrival), dan penyelesaian bongkar muat (on-time unloading).</li>
+                            <li data-i18n="exp.kl.l4">Mengawasi siklus operasional armada secara end-to-end, meliputi proses registrasi kedatangan, loading barang, perjalanan distribusi, hingga unloading di lokasi tujuan.</li>
+                        </ul>
+                    </div>
+                    <div class="exp-icon"><i class="fas fa-truck"></i></div>
                 </div>
             </div>
-            <div class="skill-category">
-                <h3><i class="fas fa-laptop-code"></i> <span data-i18n="skills.software">Software & Tools</span></h3>
-                <div class="skills-grid">
-                    <div class="skill-pill"><i class="fab fa-laravel"></i> Laravel / PHP</div>
-                    <div class="skill-pill"><i class="fas fa-code-branch"></i> REST API / Swagger</div>
-                    <div class="skill-pill"><i class="fab fa-html5"></i> HTML5 / CSS3 / JS</div>
-                    <div class="skill-pill"><i class="fas fa-file-excel"></i> Advanced Spreadsheet</div>
-                    <div class="skill-pill"><i class="fas fa-chalkboard-user"></i> WMS / TMS Basic</div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Project -->
-    <section id="projects" class="reveal">
-        <div class="section-header">
-            <span>← FLAGSHIP PROJECT</span>
-            <h2 data-i18n="projects.title">Linus Cargo – Digital Logistics Platform</h2>
-        </div>
-        <div class="project-card">
-            <div class="project-img"><img src="assets/img/project.png" alt="Linus Cargo"></div>
-            <div>
-                <h3>linuscargo.com</h3>
-                <p data-i18n="projects.desc">Platform digital cargo end‑to‑end: order management, tracking, integrasi API. Dibangun dari nol sebagai founder. Mencakup business process, frontend, dan workflow monitoring.</p>
+        <section id="skills" class="reveal">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <span>← COMPETENCIES</span>
+                    <h2 data-i18n="skills.title">Keahlian</h2>
+                </div>
+            </div>
+            <div class="skills-container">
+                <div class="skill-group">
+                    <h3><i class="fas fa-cubes"></i> <span data-i18n="skills.soft">Supply Chain & Operasional</span></h3>
+                    <div class="pills">
+                        <div class="pill">Supply Chain Management</div><div class="pill">Third-Party Logistics (3PL)</div><div class="pill">Vendor Management</div><div class="pill">Fleet Management</div><div class="pill">Distribution Planning</div><div class="pill">Transport Planning</div><div class="pill">Monitoring Pengiriman</div><div class="pill">Warehouse Coordination</div>
+                    </div>
+                </div>
+                <div class="skill-group">
+                    <h3><i class="fas fa-code"></i> <span data-i18n="skills.hard">Digital & Tools</span></h3>
+                    <div class="pills">
+                        <div class="pill">Microsoft Excel / Office</div><div class="pill">Google Spreadsheet</div><div class="pill">Laravel PHP Dasar</div><div class="pill">API Integration Dasar</div><div class="pill">Google Ads & Media Sosial</div><div class="pill">Leadership & Team Coordination</div><div class="pill">Business Process Development</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="reveal">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <span>← FLAGSHIP</span>
+                    <h2 data-i18n="projects.title">Linus Cargo · Digital Logistics</h2>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-icon"><i class="fas fa-globe-asia"></i></div>
                 <div>
-                    <span class="tech-badge">Laravel</span>
-                    <span class="tech-badge">REST API</span>
-                    <span class="tech-badge">Swagger</span>
-                    <span class="tech-badge">Frontend</span>
+                    <h3>linuscargo.com</h3>
+                    <p data-i18n="projects.desc">Platform digital cargo end-to-end: order management, tracking real-time, integrasi API Swagger. Dibangun dari nol sebagai project development lead.</p>
+                    <div class="tech-stack"><span>Laravel</span><span>Swagger</span><span>Google Ads</span><span>Responsive</span></div>
+                    <a href="#" class="btn btn-primary" style="margin-top:28px;" data-i18n="projects.btn"><i class="fas fa-external-link"></i> Kunjungi Platform</a>
                 </div>
-                <a href="https://linuscargo.com" target="_blank" class="btn btn-primary" style="margin-top:30px; display:inline-block;" data-i18n="projects.btn">Visit Platform →</a>
+            </div>
+        </section>
+
+        <div class="reveal" style="margin: 50px 0;">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <span>← EDUCATION</span>
+                    <h2 data-i18n="edu.title">Pendidikan & Bahasa</h2>
+                </div>
+            </div>
+            <div style="background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 48px; padding: 40px; display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between;">
+                <div><i class="fas fa-university"></i> <strong>Universitas Pelita Bangsa</strong><br>S1 Manajemen – Fakultas Ekonomi dan Bisnis<br>IPK: 3.43/4.00 · Sep 2021 - Sekarang</div>
+                <div><i class="fas fa-language"></i> <strong data-i18n="edu.lang">Bahasa</strong><br><span data-i18n="edu.id">Bahasa Indonesia (Tingkat Kemampuan: Mahir)</span><br><span data-i18n="edu.en">Bahasa Inggris (Tingkat Kemampuan: Menengah)</span></div>
+                <div><i class="fas fa-map-marker-alt"></i> <strong data-i18n="edu.loc">Lokasi</strong><br><span data-i18n="edu.locValue">Magelang, Jateng · siap relokasi/remote</span></div>
+                <div><i class="fas fa-link"></i> <strong>Portfolio Web</strong><br><a href="https://alfinilham301-oss.github.io/Alfin-Ilham/" style="color:var(--accent-blue)">alfinilham301-oss.github.io</a></div>
             </div>
         </div>
-    </section>
 
-    <!-- Education & Location -->
-    <div class="reveal" style="margin: 40px 0;">
-        <div class="section-header">
-            <span>← BACKGROUND</span>
-            <h2 data-i18n="bg.title">Pendidikan & Informasi</h2>
-        </div>
-        <div style="background: var(--card-bg); backdrop-filter: blur(12px); border-radius: 32px; padding: 32px; border: 1px solid var(--border);">
-            <p data-i18n="bg.edu"><strong>🎓 Universitas Pelita Bangsa</strong> – Manajemen Ekonomi Bisnis (Konsentrasi MSDM)<br>2020 – 2025 (Cuti mulai semester 8) | IPK 3.37</p>
-            <p style="margin-top: 20px;"><strong data-i18n="bg.lang">🌐 Bahasa</strong><br><span data-i18n="lang.id">Bahasa Indonesia — Aktif</span><br><span data-i18n="lang.en">Bahasa Inggris — Intermediate (menengah)</span></p>
-            <p style="margin-top: 20px;"><strong data-i18n="bg.location">📍 Lokasi</strong><br><span data-i18n="location.value">Magelang, Jawa Tengah, Indonesia — siap relokasi / remote</span></p>
-        </div>
-    </div>
-
-    <!-- Contact -->
-    <section id="contact" class="reveal">
-        <div class="contact-terminal">
-            <i class="fas fa-terminal" style="font-size: 2.8rem; color: var(--accent); margin-bottom: 20px;"></i>
-            <h2 data-i18n="contact.title">Mulai Percakapan Baru</h2>
-            <p data-i18n="contact.sub" style="margin-top: 12px;">Open for strategic roles, consulting, or digital transformation leadership.</p>
-            <div class="contact-links">
-                <a href="mailto:alfinilham301@gmail.com" class="contact-link"><i class="fas fa-envelope"></i> alfinilham301@gmail.com</a>
-                <a href="https://wa.me/6285963131098" target="_blank" class="contact-link"><i class="fab fa-whatsapp"></i> +62 859-6313-1098</a>
-                <a href="https://linkedin.com/in/alfin-ilham-512188224" target="_blank" class="contact-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+        <section id="contact" class="reveal">
+            <div class="contact-cosmic">
+                <i class="fas fa-paper-plane" style="font-size: 3rem; color: var(--accent-pink);"></i>
+                <h2 style="margin: 20px 0;" data-i18n="contact.title">Hubungi Saya</h2>
+                <p data-i18n="contact.sub">Terbuka untuk peran strategis, konsultasi transformasi digital, atau kolaborasi supply chain.</p>
+                <div class="contact-links">
+                    <div class="contact-item"><a href="mailto:alfinilham301@gmail.com"><i class="fas fa-envelope"></i> alfinilham301@gmail.com</a></div>
+                    <div class="contact-item"><a href="https://wa.me/6285963131098"><i class="fab fa-whatsapp"></i> +62 859-6313-1098</a></div>
+                    <div class="contact-item"><a href="https://linkedin.com/in/alfin-ilham-512188224"><i class="fab fa-linkedin"></i> LinkedIn</a></div>
+                </div>
+                <a href="assets/Alfin_Ilham_Resume.pdf" download class="btn btn-primary" style="background: var(--accent-purple);"><i class="fas fa-download"></i> <span data-i18n="resume">Download Resume (PDF)</span></a>
             </div>
-            <p style="margin-top: 28px; font-size: 0.85rem;" data-i18n="contact.location">📍 Magelang, Central Java, Indonesia — ready for relocation / remote</p>
-            <div style="margin-top: 20px;">
-                <a href="#" id="downloadCVFooter" class="btn btn-primary" style="background: var(--accent); display: inline-flex; gap: 8px;"><i class="fas fa-download"></i> <span data-i18n="resume">Download Resume (PDF)</span></a>
-            </div>
-        </div>
-    </section>
+        </section>
+        <footer>© 2026 Alfin Ilham — Cosmic Supply Chain & Front-end Design</footer>
+    </main>
 
-    <footer>© 2026 Alfin Ilham — Cosmic ✦ Night / Dawn Portfolio | From Kenek to Digital Logistics Founder</footer>
-</main>
+    <!-- Three.js Creative 3D Background -->
+    <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js" } }</script>
+    <script type="module">
+        import * as THREE from 'three';
 
-<!-- Three.js 3D Background (Dynamic dan sesuai tema) -->
-<script type="importmap">
-    { "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js" } }
-</script>
-<script type="module">
-    import * as THREE from 'three';
-
-    const canvas = document.getElementById('canvas-bg');
-    const scene = new THREE.Scene();
-    scene.background = null;
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 2, 12);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0);
-    canvas.appendChild(renderer.domElement);
-
-    // Lighting
-    const ambient = new THREE.AmbientLight(0x333344);
-    scene.add(ambient);
-    const mainLight = new THREE.DirectionalLight(0xffdd99, 1);
-    mainLight.position.set(2, 3, 4);
-    scene.add(mainLight);
-    const fillLight = new THREE.PointLight(0xffaa66, 0.5);
-    fillLight.position.set(-1, 1, 2);
-    scene.add(fillLight);
-
-    // central object – abstract cargo shape
-    const geometry = new THREE.IcosahedronGeometry(0.7, 0);
-    const materialGold = new THREE.MeshStandardMaterial({ color: 0xC9A87C, metalness: 0.7, roughness: 0.3 });
-    const core = new THREE.Mesh(geometry, materialGold);
-    scene.add(core);
-
-    // floating rings
-    const ringGroup = new THREE.Group();
-    const ringMat = new THREE.MeshStandardMaterial({ color: 0x88a5c0, metalness: 0.5 });
-    for (let i = 0; i < 12; i++) {
-        const torus = new THREE.Mesh(new THREE.TorusGeometry(1.1, 0.05, 32, 100), ringMat);
-        torus.rotation.x = Math.PI / 2;
-        torus.rotation.z = (i / 12) * Math.PI * 2;
-        torus.position.set(Math.cos(i) * 0.9, Math.sin(i * 2) * 0.4, Math.sin(i) * 0.9);
-        ringGroup.add(torus);
-    }
-    scene.add(ringGroup);
-
-    // floating particles (cosmic dust)
-    const particleCount = 800;
-    const particleGeo = new THREE.BufferGeometry();
-    const posArray = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-        posArray[i*3] = (Math.random() - 0.5) * 18;
-        posArray[i*3+1] = (Math.random() - 0.5) * 8;
-        posArray[i*3+2] = (Math.random() - 0.5) * 18 - 5;
-    }
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    const particleMat = new THREE.PointsMaterial({ color: 0x88a5c0, size: 0.06, transparent: true, opacity: 0.5 });
-    const particles = new THREE.Points(particleGeo, particleMat);
-    scene.add(particles);
-
-    // colors based on theme (dark/light) akan diupdate melalui event listener
-    function setThemeColors(isDark) {
-        const ringColor = isDark ? 0x88a5c0 : 0xE8A87C;
-        const particleColor = isDark ? 0x88a5c0 : 0xE8A87C;
-        ringGroup.children.forEach(child => child.material.color.setHex(ringColor));
-        particleMat.color.setHex(particleColor);
-        materialGold.color.setHex(isDark ? 0xC9A87C : 0xE8A87C);
-    }
-
-    // animate
-    let time = 0;
-    function animate() {
-        requestAnimationFrame(animate);
-        time += 0.006;
-        core.rotation.y = time * 0.3;
-        core.rotation.x = Math.sin(time * 0.4) * 0.1;
-        ringGroup.rotation.y = time * 0.2;
-        ringGroup.rotation.x = Math.sin(time * 0.25) * 0.1;
-        particles.rotation.y = time * 0.02;
-        window.mouseX && (camera.position.x += ( (window.mouseX / window.innerWidth - 0.5) * 1.5 - camera.position.x ) * 0.03);
-        camera.lookAt(0, 0, 0);
-        renderer.render(scene, camera);
-    }
-    animate();
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        const canvas = document.getElementById('canvas-bg');
+        const scene = new THREE.Scene();
+        scene.background = null;
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 1.5, 14);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-    window.addEventListener('mousemove', (e) => { window.mouseX = e.clientX; });
-    window.mouseX = 0;
-
-    // export function to be called on theme toggle
-    window.update3DTheme = setThemeColors;
-    setThemeColors(true);
-</script>
-
-<script>
-    // ========== LOADER ==========
-    window.addEventListener('load', () => {
-        const loader = document.getElementById('loader');
-        gsap.to(loader, { opacity: 0, duration: 0.8, delay: 1.2, onComplete: () => { loader.style.display = 'none'; } });
-    });
-
-    // ========== MULTI LANGUAGE (ID/EN) ==========
-    const translations = {
-        id: {
-            nav: { home: "Beranda", exp: "Pengalaman", skills: "Keahlian", projects: "Proyek", contact: "Kontak" },
-            hero: { desc: "Profesional logistik dengan 6+ tahun pengalaman, dari asisten driver (kenek) hingga Supervisor Order Management dan Founder Linus Cargo. Menginisiasi sistem centralized vendor management berbasis spreadsheet yang memangkas personel dari ±14 menjadi 4–5 orang, serta membangun platform digital cargo dari nol." },
-            btn: { journey: "Lihat Perjalanan", contact: "Hubungi Saya" },
-            exp: {
-                title: "Dari Lapangan ke Digital Logistics",
-                kl: { role: "Asisten Driver → Transport Planning & 3PL Operations Staff", p1: "Mulai sebagai asisten driver (kenek), memahami operasional distribusi.", p2: "Maret 2020: dipercaya mengelola schedule driver & fleet management.", p3: "4 bulan kemudian pindah ke Vendor Management (3PL Operations).", p4: "Membantu pemenuhan armada eksternal sesuai permintaan warehouse.", p5: "Inisiasi sistem centralized vendor management berbasis spreadsheet otomatis – efisiensi order & monitoring.", p6: "Hasil: personel order, monitoring, invoice GR berkurang dari ±14 menjadi 4–5 orang.", p7: "Optimalisasi route planning & monitoring berbasis sistem." },
-                lidah: { role: "Supervisor Order Management", p1: "Mengelola distribusi hingga 4.500 ton per bulan, akurasi 98%.", p2: "Mengubah mindset staff: KPI, SLA, dan pentingnya WMS.", p3: "Mewajibkan komunikasi lintas departemen dalam grup (Sales, PPIC, BOA, Owner).", p4: "Mengawasi PPIC dalam MPS (Make to Stock) dan sinkronisasi Make to Order dengan shipdate.", p5: "Menginisiasi planning by maps untuk optimasi pengiriman." },
-                cargo: { role: "Founder & Digital Logistics Architect", p1: "Menginisiasi unit bisnis digital cargo atas instruksi owner (proyek mandek 1 tahun).", p2: "Merancang framework & business process, analisa SWOT kompetitor untuk pricing.", p3: "Mengembangkan website order & tracking (Laravel + VSCode), integrasi Swagger API.", p4: "Membuat SOP digital workflow, iklan promosi, kelola sosial media.", p5: "Mendorong transformasi logistik modern, transparan, dan efisien." }
-            },
-            skills: { title: "Soft · Hard · Digital Tools", soft: "Soft Skills", hard: "Hard Skills", software: "Software & Tools" },
-            projects: { title: "Linus Cargo – Platform Logistik Digital", desc: "Platform digital cargo end‑to‑end: order management, tracking, integrasi API. Dibangun dari nol sebagai founder.", btn: "Kunjungi Platform →" },
-            bg: { title: "Pendidikan & Informasi", edu: "🎓 Universitas Pelita Bangsa – Manajemen Ekonomi Bisnis (Konsentrasi MSDM)<br>2020 – 2025 (Cuti mulai semester 8) | IPK 3.37", lang: "🌐 Bahasa", location: "📍 Lokasi" },
-            lang: { id: "Bahasa Indonesia — Aktif", en: "Bahasa Inggris — Intermediate (menengah)" },
-            location: { value: "Magelang, Jawa Tengah, Indonesia — siap relokasi / remote" },
-            contact: { title: "Mulai Percakapan Baru", sub: "Terbuka untuk peran strategis, konsultasi transformasi digital, atau kolaborasi supply chain.", location: "📍 Magelang, Jawa Tengah, Indonesia — ready for relocation / remote" },
-            resume: "Resume"
-        },
-        en: {
-            nav: { home: "Home", exp: "Experience", skills: "Skills", projects: "Projects", contact: "Contact" },
-            hero: { desc: "Logistics professional with 6+ years of experience, from assistant driver (kenek) to Order Management Supervisor and Founder of Linus Cargo. Initiated a centralized vendor management system using automated spreadsheets, reducing operational headcount from ±14 to 4–5 people, and built a digital cargo platform from scratch." },
-            btn: { journey: "View Journey", contact: "Contact Me" },
-            exp: {
-                title: "From Field to Digital Logistics",
-                kl: { role: "Assistant Driver → Transport Planning & 3PL Operations Staff", p1: "Started as assistant driver (kenek), understanding ground-level distribution.", p2: "March 2020: promoted to schedule driver & fleet management.", p3: "Four months later moved to Vendor Management (3PL Operations).", p4: "Assisted in fulfilling external fleet requests per warehouse demand.", p5: "Initiated centralized vendor management system via automated spreadsheet – ordering & monitoring efficiency.", p6: "Result: personnel for order, monitoring, invoice GR reduced from ±14 to 4–5 people.", p7: "Involved in route planning & system-based monitoring optimization." },
-                lidah: { role: "Order Management Supervisor", p1: "Managed distribution of 4,500+ tons/month with 98% accuracy.", p2: "Transformed staff mindset: introduced KPI, SLA, and WMS importance.", p3: "Required cross‑department communication in groups (Sales, PPIC, BOA, Owner).", p4: "Oversaw PPIC in MPS (Make to Stock) and alignment of Make to Order with shipdate.", p5: "Initiated planning by maps for delivery optimization." },
-                cargo: { role: "Founder & Digital Logistics Architect", p1: "Initiated digital cargo business unit upon owner's instruction (project stalled for 1 year).", p2: "Designed framework & business process, competitor SWOT analysis for pricing.", p3: "Developed order & tracking website (Laravel + VSCode), integrated Swagger API.", p4: "Created digital workflow SOP, ads, and social media management.", p5: "Driving modern, transparent, and efficient logistics transformation." }
-            },
-            skills: { title: "Soft · Hard · Digital Tools", soft: "Soft Skills", hard: "Hard Skills", software: "Software & Tools" },
-            projects: { title: "Linus Cargo – Digital Logistics Platform", desc: "End‑to‑end digital cargo platform: order management, tracking, API integration. Built from zero as founder.", btn: "Visit Platform →" },
-            bg: { title: "Education & Information", edu: "🎓 Universitas Pelita Bangsa – Business Economics (HR Concentration)<br>2020 – 2025 (off from semester 8) | GPA 3.37", lang: "🌐 Languages", location: "📍 Location" },
-            lang: { id: "Bahasa Indonesia — Active", en: "English — Intermediate" },
-            location: { value: "Magelang, Central Java, Indonesia — ready for relocation / remote" },
-            contact: { title: "Start a new conversation", sub: "Open for strategic roles, digital transformation consulting, or supply chain collaboration.", location: "📍 Magelang, Central Java, Indonesia — ready for relocation / remote" },
-            resume: "Resume"
+        renderer.setClearColor(0x000000, 0);
+        canvas.appendChild(renderer.domElement);
+        
+        // --- Starfield dengan warna-warni dan gerakan spiral ---
+        const starCount = 2500;
+        const starGeometry = new THREE.BufferGeometry();
+        const starPositions = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount; i++) {
+            // distribusi spiral
+            const radius = 15 + Math.random() * 40;
+            const angle = Math.random() * Math.PI * 2;
+            const height = (Math.random() - 0.5) * 30;
+            starPositions[i*3] = Math.cos(angle) * radius;
+            starPositions[i*3+1] = height;
+            starPositions[i*3+2] = Math.sin(angle) * radius;
+            
+            const colorChoice = Math.random();
+            if (colorChoice < 0.6) { starColors[i*3]=1; starColors[i*3+1]=1; starColors[i*3+2]=1; }
+            else if (colorChoice < 0.8) { starColors[i*3]=0.5; starColors[i*3+1]=0.7; starColors[i*3+2]=1; }
+            else { starColors[i*3]=1; starColors[i*3+1]=0.5; starColors[i*3+2]=0.8; }
         }
-    };
-
-    let currentLang = localStorage.getItem('lang') || 'id';
-    function setLanguage(lang) {
-        currentLang = lang;
-        localStorage.setItem('lang', lang);
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            const value = key.split('.').reduce((o, k) => o?.[k], translations[lang]);
-            if (value !== undefined && value !== null) {
-                if (el.tagName === 'INPUT') el.placeholder = value;
-                else el.innerHTML = value;
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+        const starMaterial = new THREE.PointsMaterial({ size: 0.12, vertexColors: true, transparent: true, opacity: 0.8 });
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
+        
+        // --- Objek utama: Torus Knot (lebih kreatif) ---
+        const knotGeo = new THREE.TorusKnotGeometry(0.9, 0.22, 180, 24, 3, 4);
+        const knotMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, metalness: 0.9, roughness: 0.2, emissive: 0x1e40af, emissiveIntensity: 0.4 });
+        const knot = new THREE.Mesh(knotGeo, knotMat);
+        scene.add(knot);
+        
+        // --- Cincin ganda mengelilingi knot ---
+        const ringGroup = new THREE.Group();
+        const ringMat1 = new THREE.MeshStandardMaterial({ color: 0xec4899, metalness: 0.7, emissive: 0x831843, emissiveIntensity: 0.2 });
+        const ringMat2 = new THREE.MeshStandardMaterial({ color: 0xa855f7, metalness: 0.7, emissive: 0x4c1d95, emissiveIntensity: 0.2 });
+        const ringBig = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.06, 64, 200), ringMat1);
+        ringBig.rotation.x = Math.PI / 2;
+        ringGroup.add(ringBig);
+        const ringTilt = new THREE.Mesh(new THREE.TorusGeometry(1.8, 0.05, 64, 200), ringMat2);
+        ringTilt.rotation.z = Math.PI / 3;
+        ringTilt.rotation.x = Math.PI / 4;
+        ringGroup.add(ringTilt);
+        const ringSmall = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.04, 64, 200), ringMat1);
+        ringSmall.rotation.x = Math.PI / 1.5;
+        ringSmall.rotation.z = Math.PI / 5;
+        ringGroup.add(ringSmall);
+        scene.add(ringGroup);
+        
+        // --- Partikel berkilau mengelilingi (efek komet) ---
+        const particleCount = 1200;
+        const particleGeo = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+            const radius = 2 + Math.random() * 1.5;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            particlePositions[i*3] = radius * Math.sin(phi) * Math.cos(theta);
+            particlePositions[i*3+1] = radius * Math.sin(phi) * Math.sin(theta);
+            particlePositions[i*3+2] = radius * Math.cos(phi);
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const particleMat = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.06, transparent: true, opacity: 0.7 });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        scene.add(particles);
+        
+        // --- Floating glowing orbs (efek magis) ---
+        const orbGroup = new THREE.Group();
+        const orbMat = new THREE.MeshStandardMaterial({ color: 0xff88cc, emissive: 0xff44aa, emissiveIntensity: 0.3 });
+        for (let i = 0; i < 80; i++) {
+            const orb = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 16), orbMat);
+            const rad = 2.4;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            orb.position.set(rad * Math.sin(phi) * Math.cos(theta), rad * Math.sin(phi) * Math.sin(theta), rad * Math.cos(phi));
+            orbGroup.add(orb);
+        }
+        scene.add(orbGroup);
+        
+        // --- Sinar directional dan ambient ---
+        const ambientLight = new THREE.AmbientLight(0x222233);
+        scene.add(ambientLight);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+        mainLight.position.set(2, 3, 4);
+        scene.add(mainLight);
+        const backLight = new THREE.PointLight(0xa855f7, 0.6);
+        backLight.position.set(-1, 1, 2);
+        scene.add(backLight);
+        const fillLight = new THREE.PointLight(0x3b82f6, 0.5);
+        fillLight.position.set(1, 2, 3);
+        scene.add(fillLight);
+        
+        // --- Animasi ---
+        let time = 0;
+        
+        function animateScene() {
+            requestAnimationFrame(animateScene);
+            time += 0.008;
+            
+            knot.rotation.y = time * 0.3;
+            knot.rotation.x = Math.sin(time * 0.5) * 0.2;
+            knot.rotation.z = Math.cos(time * 0.4) * 0.1;
+            
+            ringGroup.rotation.y = time * 0.2;
+            ringGroup.rotation.x = Math.sin(time * 0.25) * 0.15;
+            ringGroup.rotation.z = Math.cos(time * 0.3) * 0.1;
+            
+            particles.rotation.y = time * 0.1;
+            particles.rotation.x = Math.sin(time * 0.2) * 0.05;
+            orbGroup.rotation.y = time * 0.12;
+            orbGroup.rotation.x = time * 0.08;
+            
+            stars.rotation.y += 0.0004;
+            stars.rotation.x += 0.0003;
+            
+            // Efek mouse
+            if (window.mouseX) {
+                camera.position.x += ((window.mouseX / window.innerWidth - 0.5) * 1.5 - camera.position.x) * 0.05;
+                camera.position.y += ((-window.mouseY / window.innerHeight + 0.5) * 1 - camera.position.y) * 0.05;
             }
+            camera.lookAt(0, 0, 0);
+            
+            renderer.render(scene, camera);
+        }
+        animateScene();
+        
+        function update3DColors(isDark) {
+            const mainColor = isDark ? 0x3b82f6 : 0x2563eb;
+            const ring1Color = isDark ? 0xec4899 : 0xdb2777;
+            const ring2Color = isDark ? 0xa855f7 : 0x9333ea;
+            knot.material.color.setHex(mainColor);
+            ringGroup.children[0].material.color.setHex(ring1Color);
+            ringGroup.children[1].material.color.setHex(ring2Color);
+            ringGroup.children[2].material.color.setHex(ring1Color);
+            particleMat.color.setHex(isDark ? 0x88aaff : 0x3b82f6);
+        }
+        window.update3DTheme = update3DColors;
+        update3DColors(true);
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
-        document.getElementById('langID').classList.toggle('active', lang === 'id');
-        document.getElementById('langEN').classList.toggle('active', lang === 'en');
-    }
-    document.getElementById('langID').addEventListener('click', () => setLanguage('id'));
-    document.getElementById('langEN').addEventListener('click', () => setLanguage('en'));
-    setLanguage(currentLang);
+        window.addEventListener('mousemove', (e) => { window.mouseX = e.clientX; window.mouseY = e.clientY; });
+        window.mouseX = 0; window.mouseY = 0;
+    </script>
 
-    // ========== THEME TOGGLE ==========
-    const body = document.body;
-    const toggleBtn = document.getElementById('themeToggle');
-    const icon = toggleBtn.querySelector('i');
-    function updateTheme() {
-        const isDark = body.classList.contains('dark');
-        icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
-        if (window.update3DTheme) window.update3DTheme(isDark);
-    }
-    if (localStorage.getItem('theme') === 'light') body.classList.remove('dark'), body.classList.add('light');
-    else body.classList.add('dark'), body.classList.remove('light');
-    updateTheme();
-    toggleBtn.addEventListener('click', () => {
-        if (body.classList.contains('dark')) {
+    <script>
+        // ========== MULTI LANGUAGE ==========
+        const translations = { /* ... sama seperti sebelumnya ... */ 
+            id: {
+                nav: { home: "Beranda", exp: "Pengalaman", skills: "Keahlian", projects: "Proyek", contact: "Kontak" },
+                hero: { badge: "Supply Chain + Inovasi Digital", desc: "Profesional di bidang Supply Chain dan Logistik dengan pengalaman lebih dari 6 tahun dalam operasional distribusi, manajemen vendor (3PL), dan perencanaan transportasi. Memiliki rekam jejak yang konsisten dalam mengelola kelancaran rantai pasok, mengevaluasi kinerja vendor expedisi, serta memimpin tim lintas departemen untuk mencapai target operasional harian. Selain keahlian logistik inti, memiliki nilai tambah dalam mengintegrasikan proses operasional konvensional dengan solusi teknologi digital, mencakup pengembangan sistem berbasis web, integrasi API, dan strategi digital marketing untuk mendukung ekspansi bisnis perusahaan." },
+                btn: { journey: "Lihat Perjalanan", contact: "Hubungi Saya" },
+                exp: { title: "Pengalaman Kerja",
+                    lidah: { l1: "Memimpin dan mengelola perencanaan jadwal pengiriman untuk memastikan seluruh proses distribusi berjalan sesuai dengan target perusahaan baik secara kuantitas dan kualitas.", l2: "Mengkoordinasikan Master Production Schedule (MPS) melalui evaluasi berkala bersama departemen Sales dan PPIC guna menyelaraskan kapasitas produksi dengan ketersediaan ruang penyimpanan.", l3: "Menjaga keseimbangan inventaris gudang dan meminimalisir penumpukan barang dengan mendorong percepatan distribusi produk slow-moving bersama tim Sales.", l4: "Memonitor indikator On-Time Delivery (OTD) secara harian dengan mengawasi ketat jadwal pengiriman (ship date) dan kesiapan operasional armada." },
+                    cargo: { l1: "Merancang framework operasional dan Standard Operating Procedure (SOP) secara komprehensif untuk peluncuran unit bisnis baru, Linus Cargo.", l2: "Mengembangkan front-end situs web logistik perusahaan menggunakan Laravel PHP dan mengeksekusi integrasi dengan API Swagger untuk kebutuhan aplikasi order dan pelacakan berbasis web.", l3: "Mendukung strategi penetrasi pasar melalui pengelolaan kampanye digital marketing menggunakan Google Ads dan optimalisasi aset media sosial perusahaan." },
+                    kl: { l1: "Memulai karier operasional lapangan (Assistant Driver) hingga dipercaya untuk mengelola Fleet Manajemen dan Vendor Management secara penuh.", l2: "Merencanakan penjadwalan harian, memplot armada, dan mengelola alokasi unit dari vendor 3PL untuk memastikan seluruh pemenuhan permintaan pengiriman warehouse terpenuhi.", l3: "Mengevaluasi kinerja vendor 3PL secara berkala berdasarkan metrik pencapaian tingkat pemenuhan unit (fulfillment unit), ketepatan waktu kedatangan (on-time arrival), dan penyelesaian bongkar muat (on-time unloading).", l4: "Mengawasi siklus operasional armada secara end-to-end, meliputi proses registrasi kedatangan, loading barang, perjalanan distribusi, hingga unloading di lokasi tujuan." }
+                },
+                skills: { title: "Keahlian", soft: "Supply Chain & Operasional", hard: "Digital & Tools" },
+                projects: { title: "Linus Cargo · Digital Logistics", desc: "Platform digital cargo end-to-end: order management, tracking real-time, integrasi API Swagger. Dibangun dari nol sebagai project development lead.", btn: "Kunjungi Platform" },
+                edu: { title: "Pendidikan & Bahasa", lang: "Bahasa", id: "Bahasa Indonesia (Tingkat Kemampuan: Mahir)", en: "Bahasa Inggris (Tingkat Kemampuan: Menengah)", loc: "Lokasi", locValue: "Magelang, Jateng · siap relokasi/remote" },
+                contact: { title: "Hubungi Saya", sub: "Terbuka untuk peran strategis, konsultasi transformasi digital, atau kolaborasi supply chain." },
+                resume: "Resume"
+            },
+            en: {
+                nav: { home: "Home", exp: "Experience", skills: "Skills", projects: "Projects", contact: "Contact" },
+                hero: { badge: "Supply Chain + Digital Innovation", desc: "Supply Chain and Logistics professional with over 6 years of experience in distribution operations, 3PL vendor management, and transport planning. Proven track record in managing supply chain smoothness, evaluating expedition vendor performance, and leading cross-functional teams to achieve daily operational targets. In addition to core logistics expertise, has added value in integrating conventional operational processes with digital technology solutions, including web-based system development, API integration, and digital marketing strategies to support company business expansion." },
+                btn: { journey: "View Journey", contact: "Contact Me" },
+                exp: { title: "Work Experience",
+                    lidah: { l1: "Lead and manage delivery schedule planning to ensure all distribution processes run according to company targets both in quantity and quality.", l2: "Coordinate Master Production Schedule (MPS) through regular evaluation with Sales and PPIC departments to align production capacity with storage availability.", l3: "Maintain warehouse inventory balance and minimize backlog by accelerating slow-moving product distribution with Sales team.", l4: "Monitor On-Time Delivery (OTD) indicators daily by strictly overseeing shipping schedules (ship date) and fleet operational readiness." },
+                    cargo: { l1: "Design comprehensive operational framework and Standard Operating Procedure (SOP) for launching new business unit, Linus Cargo.", l2: "Develop front-end logistics company website using Laravel PHP and execute integration with Swagger API for web-based order and tracking applications.", l3: "Support market penetration strategy through managing digital marketing campaigns using Google Ads and optimizing company social media assets." },
+                    kl: { l1: "Started operational career as Assistant Driver, then trusted to fully manage Fleet Management and Vendor Management.", l2: "Plan daily scheduling, plot fleet, and manage unit allocation from 3PL vendors to ensure all warehouse delivery requests are fulfilled.", l3: "Regularly evaluate 3PL vendor performance based on unit fulfillment rate, on-time arrival, and on-time unloading metrics.", l4: "Oversee end-to-end fleet operational cycle, including arrival registration, cargo loading, distribution travel, to unloading at destination." }
+                },
+                skills: { title: "Skills", soft: "Supply Chain & Operational", hard: "Digital & Tools" },
+                projects: { title: "Linus Cargo · Digital Logistics", desc: "End-to-end digital cargo platform: order management, real-time tracking, Swagger API integration. Built from scratch as project development lead.", btn: "Visit Platform" },
+                edu: { title: "Education & Languages", lang: "Languages", id: "Indonesian (Fluent)", en: "English (Intermediate)", loc: "Location", locValue: "Magelang, Central Java · ready for relocation/remote" },
+                contact: { title: "Contact Me", sub: "Open for strategic roles, digital transformation consulting, or supply chain collaboration." },
+                resume: "Resume"
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'id';
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const value = key.split('.').reduce((o, k) => o?.[k], translations[lang]);
+                if (value !== undefined) {
+                    if (el.tagName === 'INPUT') el.placeholder = value;
+                    else el.innerHTML = value;
+                }
+            });
+            document.getElementById('langID').classList.toggle('active', lang === 'id');
+            document.getElementById('langEN').classList.toggle('active', lang === 'en');
+        }
+        document.getElementById('langID').addEventListener('click', () => setLanguage('id'));
+        document.getElementById('langEN').addEventListener('click', () => setLanguage('en'));
+        setLanguage(currentLang);
+
+        // Theme Toggle
+        const body = document.body;
+        const toggleBtn = document.getElementById('themeToggle');
+        const icon = toggleBtn.querySelector('i');
+        function updateThemeUI() {
+            const isDark = body.classList.contains('dark');
+            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+            if (window.update3DTheme) window.update3DTheme(isDark);
+        }
+        if (localStorage.getItem('theme') === 'light') {
             body.classList.remove('dark'); body.classList.add('light');
-            localStorage.setItem('theme', 'light');
         } else {
             body.classList.add('dark'); body.classList.remove('light');
-            localStorage.setItem('theme', 'dark');
         }
-        updateTheme();
-    });
-
-    // Download CV placeholder
-    document.querySelectorAll('#downloadCV, #downloadCVFooter').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('📄 Silakan ganti link dengan file CV/resume Anda.\nContoh: href="assets/Alfin_Ilham_CV.pdf"');
+        updateThemeUI();
+        toggleBtn.addEventListener('click', () => {
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark'); body.classList.add('light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.add('dark'); body.classList.remove('light');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateThemeUI();
         });
-    });
 
-    // GSAP Scroll Reveal
-    gsap.registerPlugin(ScrollTrigger);
-    gsap.utils.toArray('.reveal').forEach(el => {
-        gsap.set(el, { opacity: 0, y: 55 });
-        ScrollTrigger.create({ trigger: el, start: 'top 85%', onEnter: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }), once: true });
-    });
-
-    // 3D photo effect
-    const photoFrame = document.querySelector('.photo-frame');
-    if (photoFrame) {
-        photoFrame.addEventListener('mousemove', (e) => {
-            const rect = photoFrame.getBoundingClientRect();
-            const x = e.clientX - rect.left, y = e.clientY - rect.top;
-            const rotY = ((x / rect.width) - 0.5) * 18, rotX = ((y / rect.height) - 0.5) * -18;
-            photoFrame.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
+        // Loader
+        window.addEventListener('load', () => {
+            gsap.to('#loader', { opacity: 0, duration: 0.8, delay: 0.6, onComplete: () => document.getElementById('loader').style.display = 'none' });
         });
-        photoFrame.addEventListener('mouseleave', () => photoFrame.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1)');
-    }
-</script>
+
+        // GSAP Scroll Reveal
+        gsap.registerPlugin(ScrollTrigger);
+        document.querySelectorAll('.reveal').forEach(el => {
+            gsap.set(el, { opacity: 0, y: 50 });
+            ScrollTrigger.create({ trigger: el, start: 'top 85%', onEnter: () => gsap.to(el, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }), once: true });
+        });
+
+        // 3D tilt on photo card
+        const photoCard = document.querySelector('.photo-card');
+        if (photoCard) {
+            photoCard.addEventListener('mousemove', (e) => {
+                const rect = photoCard.getBoundingClientRect();
+                const x = e.clientX - rect.left, y = e.clientY - rect.top;
+                const rotY = ((x / rect.width) - 0.5) * 15, rotX = ((y / rect.height) - 0.5) * -15;
+                photoCard.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
+            });
+            photoCard.addEventListener('mouseleave', () => photoCard.style.transform = '');
+        }
+    </script>
 </body>
 </html>
